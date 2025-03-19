@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/fondo"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/img_cc_logo_blanco_y_negro"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="INICIAR SESSIÓ"
+        android:textSize="40sp"
+        android:fontFamily="@font/barrioregular"
+        android:textColor="@color/black"
+        android:maxLines="1"
+        android:textStyle=""
+        android:textAlignment="center"
+        android:layout_marginTop="60dp"
+        android:layout_marginBottom="20dp"/>
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Correu"
+        android:fontFamily="@font/worksansvariablefontwght"
+        android:textSize="12dp"
+        android:layout_gravity="left"
+        android:textStyle="bold"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="94dp"/>
+
+    <EditText
+        android:id="@+id/editTextCorreoIniciarSesion"
+        android:layout_width="234dp"
+        android:layout_height="39dp"
+        android:background="@drawable/edit_text_personalizado"
+        android:textColor="@color/black"
+        android:paddingStart="15dp"
+        android:fontFamily="@font/worksansvariablefontwght" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contrasenya"
+        android:fontFamily="@font/worksansvariablefontwght"
+        android:textSize="12dp"
+        android:layout_gravity="left"
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="94dp"/>
+
+
+    <EditText
+        android:id="@+id/editTextPasswordIniciarSesion"
+        android:layout_width="234dp"
+        android:layout_height="39dp"
+        android:background="@drawable/edit_text_personalizado"
+        android:textColor="@color/black"
+        android:paddingStart="15dp"
+        android:fontFamily="@font/worksansvariablefontwght"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Si no tens compte "
+            android:textStyle="bold"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:layout_marginTop="15dp"/>
+
+        <TextView
+            android:id="@+id/txtRegistrarse"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dp"
+            android:textStyle="bold"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:text="registra't aqui."
+            android:textColor="@color/amarillo"/>
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnIniciarSesion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirmar"
+        android:layout_marginTop="20dp"
+        android:textColor="@android:color/white"
+        android:backgroundTint="@color/azul"
+        android:layout_marginBottom="60dp"/>
+</LinearLayout>

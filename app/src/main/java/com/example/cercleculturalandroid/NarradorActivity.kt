@@ -2,7 +2,8 @@ package com.example.cercleculturalandroid
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
+import android.os.Handler
+import android.os.Looper
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
@@ -11,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
 import com.airbnb.lottie.LottieAnimationView
 
-class NarradorActivity: AppCompatActivity() {
+class NarradorActivity : AppCompatActivity() {
 
     private lateinit var gestureDetector: GestureDetectorCompat
     private lateinit var imgMicro: ImageView
@@ -20,10 +21,12 @@ class NarradorActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.narrador_layout)
+
+        // Inicializar animación Lottie
         val animDeslizarDedo = findViewById<LottieAnimationView>(R.id.animDeslizarDedo)
         animDeslizarDedo.playAnimation()
 
-        // Referencia a las ImageView
+        // Referencias a las ImageView
         imgMicro = findViewById(R.id.imgMicro)
         imgMicroMute = findViewById(R.id.imgMicroMute)
 
@@ -46,7 +49,7 @@ class NarradorActivity: AppCompatActivity() {
             velocityX: Float,
             velocityY: Float
                             ): Boolean {
-            if (e1 == null || e2 == null) return false  // Prevenir crashes
+            if (e1 == null || e2 == null) return false
 
             val diffX = e2.x - e1.x
 
@@ -55,31 +58,27 @@ class NarradorActivity: AppCompatActivity() {
                     if (diffX > 0) {
                         // Deslizar de izquierda a derecha
                         imgMicroMute.setImageResource(R.drawable.img_micro_mute_rojo)
-                        //Ocultar el otro micro
                         imgMicro.visibility = View.INVISIBLE
-                        abrirMainActivity()
-
-
                     } else {
                         // Deslizar de derecha a izquierda
                         imgMicro.setImageResource(R.drawable.img_micro_verde)
-                        //Ocultar el otro micro
                         imgMicroMute.visibility = View.INVISIBLE
-                        abrirMainActivity()
                     }
+
+                    // Retrasar la navegación sin bloquear la UI
+                    Handler(Looper.getMainLooper()).postDelayed({
+                                                                    abrirIniciarSesionActivity()
+                                                                }, 500)
                 }
                 return true
             }
             return false
         }
+    }
 
-        private  fun abrirMainActivity() {
-            //Delay medio segundo
-            Thread.sleep(500)
-
-            //Ir a MainActivity
-            val intent = Intent(this@NarradorActivity, MainActivity::class.java)
-            startActivity(intent)
-        }
+    private fun abrirIniciarSesionActivity() {
+        val intent = Intent(this, IniciarSesionActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }

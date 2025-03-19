@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="@color/fondo"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/img_cc_logo_blanco_y_negro"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="REGISTRA'T"
+        android:textSize="40sp"
+        android:fontFamily="@font/barrioregular"
+        android:textColor="@color/black"
+        android:maxLines="1"
+        android:textStyle=""
+        android:textAlignment="center"
+        android:layout_marginTop="40dp"
+        android:layout_marginBottom="20dp"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nom"
+        android:fontFamily="@font/worksansvariablefontwght"
+        android:textSize="12dp"
+        android:layout_gravity="left"
+        android:textStyle="bold"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="94dp"/>
+
+    <EditText
+        android:id="@+id/editTextNomIniciarSesion"
+        android:layout_width="234dp"
+        android:layout_height="39dp"
+        android:background="@drawable/edit_text_personalizado"
+        android:textColor="@color/black"
+        android:paddingStart="15dp"
+        android:fontFamily="@font/worksansvariablefontwght" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cognom"
+        android:fontFamily="@font/worksansvariablefontwght"
+        android:textSize="12dp"
+        android:layout_gravity="left"
+        android:textStyle="bold"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="94dp"/>
+
+    <EditText
+        android:id="@+id/editTextCognomIniciarSesion"
+        android:layout_width="234dp"
+        android:layout_height="39dp"
+        android:background="@drawable/edit_text_personalizado"
+        android:textColor="@color/black"
+        android:paddingStart="15dp"
+        android:fontFamily="@font/worksansvariablefontwght" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Correu"
+        android:fontFamily="@font/worksansvariablefontwght"
+        android:textSize="12dp"
+        android:layout_gravity="left"
+        android:textStyle="bold"
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="94dp"/>
+
+    <EditText
+        android:id="@+id/editTextCorreoIniciarSesion"
+        android:layout_width="234dp"
+        android:layout_height="39dp"
+        android:background="@drawable/edit_text_personalizado"
+        android:textColor="@color/black"
+        android:paddingStart="15dp"
+        android:fontFamily="@font/worksansvariablefontwght" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Contrasenya"
+        android:fontFamily="@font/worksansvariablefontwght"
+        android:textSize="12dp"
+        android:layout_gravity="left"
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="94dp"/>
+
+
+    <EditText
+        android:id="@+id/editTextPasswordIniciarSesion"
+        android:layout_width="234dp"
+        android:layout_height="39dp"
+        android:background="@drawable/edit_text_personalizado"
+        android:textColor="@color/black"
+        android:paddingStart="15dp"
+        android:fontFamily="@font/worksansvariablefontwght"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Confirmar Contrasenya"
+        android:fontFamily="@font/worksansvariablefontwght"
+        android:textSize="12dp"
+        android:layout_gravity="left"
+        android:layout_marginBottom="5dp"
+        android:textStyle="bold"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="94dp"/>
+
+
+    <EditText
+        android:id="@+id/editTextConfPasswordIniciarSesion"
+        android:layout_width="234dp"
+        android:layout_height="39dp"
+        android:background="@drawable/edit_text_personalizado"
+        android:textColor="@color/black"
+        android:paddingStart="15dp"
+        android:fontFamily="@font/worksansvariablefontwght"/>
+
+    <Button
+        android:id="@+id/btnRegistrarse"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crear usuari"
+        android:layout_marginTop="40dp"
+        android:textColor="@android:color/white"
+        android:layout_marginBottom="40dp"
+        android:backgroundTint="@color/azul"
+        />
+</LinearLayout>
