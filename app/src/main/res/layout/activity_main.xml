@@ -19,6 +19,7 @@
             android:text="Tot"
             android:textColor="@color/black"
             android:textSize="30sp"
+            android:layout_marginLeft="190dp"
             android:textStyle="bold" />
 
         <Spinner
@@ -27,7 +28,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:entries="@array/opciones_menu"
-            android:gravity="" />
+            android:layout_marginLeft="40dp"
+            />
 
 
     </LinearLayout>
