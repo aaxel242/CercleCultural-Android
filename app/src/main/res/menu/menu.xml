@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/calendario"
+        android:title="Chat"
+        android:icon="@drawable/imgchatnotificacion"/>
+
+    <item
+        android:id="@+id/proyectos"
+        android:title="Inici"
+        android:icon="@drawable/imghome"/>
+    <item
+        android:id="@+id/Usuari"
+        android:title="Perfil"
+        android:icon="@drawable/imgusuario"/>
+</menu>

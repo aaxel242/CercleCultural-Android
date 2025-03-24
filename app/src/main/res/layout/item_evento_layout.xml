@@ -1,85 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="200dp"
-    android:layout_margin="5dp"
-    android:background="@drawable/diseno_eventos"
-    android:padding="20dp"
-    android:orientation="horizontal">
+    android:layout_height="190dp"
+    android:layout_margin="5dp">
 
     <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:orientation="vertical">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/diseno_eventos"
+        android:orientation="horizontal"
+        android:padding="20dp">
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
-
-            <TextView
-                android:id="@+id/txtNombreEvento"
-                android:layout_width="11dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.6"
-                android:ellipsize="end"
-                android:maxLines="1"
-                android:text="[Nombre]"
-                android:textColor="@color/black"
-                android:textSize="18sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="-"
-                android:textSize="18sp"
-                android:textColor="@color/black"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"/>
-
-            <TextView
-                android:id="@+id/txtFechaEvento"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.3"
-                android:text="[fecha]"
-                android:textColor="@color/black"
-                android:textSize="18sp"
-                android:gravity="end"
-                android:maxLines="1"/>
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="137dp"
-            android:gravity="left"
+            android:layout_weight="1"
             android:orientation="vertical">
 
-
-            <TextView
-                android:id="@+id/TxtDescripcion"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Descripción" />
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/TxtUbicacion"
+                <TextView
+                    android:id="@+id/txtNombreEvento"
+                    android:layout_width="11dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.6"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:text="Nombre"
+                    android:fontFamily="@font/poppinsregular"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingStart="5dp"
+                    android:fontFamily="@font/poppinsregular"
+                    android:paddingEnd="5dp"
+                    android:text="-"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/txtFechaEvento"
+                    android:layout_width="10dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:fontFamily="@font/poppinsregular"
+                    android:gravity="end"
+                    android:maxLines="1"
+                    android:text="fecha"
+                    android:textColor="@color/black"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="Ubicacion" />
+                android:layout_height="137dp"
+                android:gravity="left"
+                android:orientation="vertical">
 
+                <TextView
+                    android:id="@+id/TxtDescripcion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/worksansvariablefontwght"
+                    android:text="Descripción" />
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/TxtUbicacion"
+                        android:layout_width="59dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:layout_weight="1"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:fontFamily="@font/worksansvariablefontwght"
+                        android:text="Ubicación " />
+
+                    <TextView
+                        android:id="@+id/TxtHora"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/worksansvariablefontwght"
+                        android:layout_marginTop="10dp"
+                        android:text="Hora"
+                        android:maxLines="1"/>
+                </LinearLayout>
+            </LinearLayout>
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/imgProducto"
+            android:layout_width="173dp"
+            android:layout_height="151dp"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/imgconcierto1" />
     </LinearLayout>
 
     <ImageView
-        android:id="@+id/imgProducto"
-        android:layout_width="119dp"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:src="@drawable/imgconcierto1" />
-</LinearLayout>
+        android:id="@+id/imgClasificacionEvento"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="top|end"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:src="@drawable/imgcclogocolor_pequeno"
+        android:scaleType="fitCenter"/>
+</FrameLayout>
