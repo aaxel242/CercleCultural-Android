@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string-array name="opciones_menu">
-        <item>Opción 1</item>
-        <item>Opción 2</item>
-        <item>Opción 3</item>
+        <item>Inici</item>
+        <item>Per sales</item>
+        <item>Events actius</item>
+        <item>Events proxims</item>
     </string-array>
 </resources>
