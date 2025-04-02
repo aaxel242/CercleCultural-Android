@@ -23,7 +23,7 @@ class IniciarSesionActivity : AppCompatActivity() {
         btnIniciarSesion.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
-            finish()  // Cierra IniciarSesionActivity para no volver atrás
+            finish()  // Cierra IniciarSesionActivity para no volver atráswrgwrgr
         }
     }
 }
