@@ -34,27 +34,6 @@
                     android:textColor="@color/black"
                     android:textSize="16sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="5dp"
-                    android:fontFamily="@font/poppinsregular"
-                    android:paddingEnd="5dp"
-                    android:text="-"
-                    android:textColor="@color/black"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/txtFechaEvento"
-                    android:layout_width="10dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.3"
-                    android:fontFamily="@font/poppinsregular"
-                    android:gravity="end"
-                    android:maxLines="1"
-                    android:text="fecha"
-                    android:textColor="@color/black"
-                    android:textSize="14sp" />
             </LinearLayout>
 
             <LinearLayout
@@ -87,15 +66,16 @@
                         android:fontFamily="@font/worksansvariablefontwght"
                         android:text="Ubicación " />
 
-                    <TextView
-                        android:id="@+id/TxtHora"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:fontFamily="@font/worksansvariablefontwght"
-                        android:layout_marginTop="10dp"
-                        android:text="Hora"
-                        android:maxLines="1"/>
                 </LinearLayout>
+
+                <TextView
+                    android:id="@+id/txtFechaEvento"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:fontFamily="@font/worksansvariablefontwght"
+                    android:maxLines="1"
+                    android:text="Fecha" />
             </LinearLayout>
         </LinearLayout>
 

@@ -1,4 +1,4 @@
-package com.example.cercleculturalandroid.models;
+package com.example.cercleculturalandroid.models.clases;
 
 import java.util.Date;
 

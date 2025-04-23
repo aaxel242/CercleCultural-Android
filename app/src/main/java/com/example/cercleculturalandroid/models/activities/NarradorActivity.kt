@@ -1,4 +1,4 @@
-package com.example.cercleculturalandroid
+package com.example.cercleculturalandroid.models.activities
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,6 +11,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
 import com.airbnb.lottie.LottieAnimationView
+import com.example.cercleculturalandroid.R
 
 class NarradorActivity : AppCompatActivity() {
 

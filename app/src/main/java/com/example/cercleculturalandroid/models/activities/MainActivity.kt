@@ -1,8 +1,12 @@
-package com.example.cercleculturalandroid
+package com.example.cercleculturalandroid.models.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.example.cercleculturalandroid.R
+import com.example.cercleculturalandroid.models.fragments.fragmentChat
+import com.example.cercleculturalandroid.models.fragments.fragmentInici
+import com.example.cercleculturalandroid.models.fragments.fragmentUsuario
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
@@ -14,7 +18,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // Configurar el BottomNavigationView
-        bottomNavigationView = findViewById(R.id.bottomNavigationView)
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.itemIconTintList = null
 
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->

@@ -16,11 +16,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigationView"
+        android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
-        android:layout_height="75dp"
-        app:itemIconTint="@null"
+        android:layout_height="wrap_content"
         android:background="@drawable/diseno_eventos"
-        app:menu="@menu/menu" />
-
-</LinearLayout>
+        app:itemBackground="@drawable/no_item_background"
+        app:menu="@menu/menu"
+        /></LinearLayout>
