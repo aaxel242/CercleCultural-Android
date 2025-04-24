@@ -6,29 +6,37 @@ import androidx.fragment.app.Fragment
 import com.example.cercleculturalandroid.R
 import com.example.cercleculturalandroid.models.fragments.fragmentChat
 import com.example.cercleculturalandroid.models.fragments.fragmentInici
+import com.example.cercleculturalandroid.models.fragments.fragmentIniciAdmin
 import com.example.cercleculturalandroid.models.fragments.fragmentUsuario
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
+    private var isAdmin = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Configurar el BottomNavigationView
+        // Recupera extra de la condicion de admin
+        isAdmin = intent.getBooleanExtra("isAdmin", false)
+
+        // Configurar BottomNavigationView
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.itemIconTintList = null
-
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.inici -> {
-                    reemplazarFragmento(fragmentInici(), false)
+                    // Segun si es admin o no carga el fragmento correspondiente
+                    if (isAdmin) {
+                        reemplazarFragmento(fragmentIniciAdmin(), false)
+                    } else {
+                        reemplazarFragmento(fragmentInici(), false)
+                    }
                     true
                 }
                 R.id.chat -> {
-                    // Reemplaza con otro fragmento si lo tienes, por ejemplo: fragmentChat()
                     reemplazarFragmento(fragmentChat(), false)
                     true
                 }
@@ -40,18 +48,17 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // Mostrar el fragmento "Inici" por defecto
+        // 4) Selección inicial
         if (savedInstanceState == null) {
-            reemplazarFragmento(fragmentInici(), false)
+            // Esto disparará el listener de arriba con el ID correcto
+            bottomNavigationView.selectedItemId = R.id.inici
         }
     }
 
     private fun reemplazarFragmento(fragment: Fragment, addToBackStack: Boolean) {
-        val transaction = supportFragmentManager.beginTransaction()
+        val tx = supportFragmentManager.beginTransaction()
             .replace(R.id.flFragment, fragment)
-        if (addToBackStack) {
-            transaction.addToBackStack(null)
-        }
-        transaction.commit()
+        if (addToBackStack) tx.addToBackStack(null)
+        tx.commit()
     }
 }

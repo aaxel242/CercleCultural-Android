@@ -15,6 +15,7 @@ class RegistrarseActivity : AppCompatActivity() {
         val btnRegistrarse = findViewById<Button>(R.id.btnRegistrarse)
         btnRegistrarse.setOnClickListener {
             intent = Intent(this, MainActivity::class.java)
+            intent.putExtra("isAdmin", false)
             startActivity(intent)
         }
     }

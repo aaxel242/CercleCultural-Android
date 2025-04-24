@@ -26,7 +26,7 @@ import retrofit2.Response
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-class fragmentInici : Fragment() {
+class fragmentIniciAdmin : Fragment() {
 
     private lateinit var rvEvents: RecyclerView
     private lateinit var spinnerFiltro: Spinner
@@ -36,7 +36,7 @@ class fragmentInici : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
                              ): View? {
-        return inflater.inflate(R.layout.fragment_inici, container, false)
+        return inflater.inflate(R.layout.fragment_inici_admin, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

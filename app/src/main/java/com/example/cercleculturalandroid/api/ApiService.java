@@ -20,7 +20,6 @@ public interface ApiService {
     @GET("api/Espais")
     Call<List<Espai>> getEspais();
 
-
     @GET("api/Mensajes/{id}")
     Call<Mensajes> getMensaje(@Path("id") int id);
 

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="opciones_menu">
-        <item>Inici</item>
-        <item>Per sales</item>
-        <item>Events actius</item>
-        <item>Events proxims</item>
+    <string-array name="filtro_menu">
+        <item>Tots</item>
+        <item>Events pròxims</item>
         <item>Per infants</item>
+
     </string-array>
 </resources>
