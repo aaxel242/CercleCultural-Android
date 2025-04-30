@@ -24,6 +24,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class fragmentIniciAdmin : Fragment() {
@@ -33,8 +34,7 @@ class fragmentIniciAdmin : Fragment() {
     private var allItems: List<EventItem> = emptyList()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
                              ): View? {
         return inflater.inflate(R.layout.fragment_inici_admin, container, false)
     }
@@ -44,9 +44,7 @@ class fragmentIniciAdmin : Fragment() {
 
         spinnerFiltro = view.findViewById(R.id.spinner_filtro)
         val spinnerAdapter = ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.filtro_menu,
-            R.layout.spinner_item
+            requireContext(), R.array.filtro_menu, R.layout.spinner_item
                                                             )
         spinnerAdapter.setDropDownViewResource(R.layout.spinner_dropdown_item)
         spinnerFiltro.adapter = spinnerAdapter
@@ -59,7 +57,9 @@ class fragmentIniciAdmin : Fragment() {
                                        ) {
                 aplicarFiltro()
             }
-            override fun onNothingSelected(parent: AdapterView<*>) { /* no-op */ }
+
+            override fun onNothingSelected(parent: AdapterView<*>) { /* no-op */
+            }
         }
 
         // Configura la lista de eventos (RecyclerView)
@@ -74,8 +74,7 @@ class fragmentIniciAdmin : Fragment() {
         val api = RetrofitClient.getClient().create(ApiService::class.java)
         api.getEsdeveniments().enqueue(object : Callback<List<Eventos>> {
             override fun onResponse(
-                call: Call<List<Eventos>>,
-                response: Response<List<Eventos>>
+                call: Call<List<Eventos>>, response: Response<List<Eventos>>
                                    ) {
                 if (response.isSuccessful) {
                     val events = response.body().orEmpty()
@@ -96,8 +95,7 @@ class fragmentIniciAdmin : Fragment() {
         api.getEspais().enqueue(object : Callback<List<Espai>> {
             @RequiresApi(Build.VERSION_CODES.O)
             override fun onResponse(
-                call: Call<List<Espai>>,
-                response: Response<List<Espai>>
+                call: Call<List<Espai>>, response: Response<List<Espai>>
                                    ) {
                 if (response.isSuccessful) {
                     // Crear mapa id->Espai
@@ -105,13 +103,15 @@ class fragmentIniciAdmin : Fragment() {
 
                     // Fundir datos y crear lista de EventItem
                     val items = events.map { ev ->
+                        val raw = ev.dataInici            // e.g. "2024-06-15 20:00:00.000" o "2024-06-15T20:00:00"
+                        val dateOnly = raw.take(10)       // "2024-06-15"
                         EventItem(
-                            id = ev.id,
-                            nom = ev.nom,
+                            id         = ev.id,
+                            nom        = ev.nom,
                             descripcio = ev.descripcio,
-                            dataInici = ev.dataInici.substringBefore("T"),
-                            espai_id = ev.espai_id,
-                            ubicacio = espaisMap[ev.espai_id]?.ubicacio.orEmpty(),
+                            dataInici  = dateOnly,
+                            espai_id   = ev.espai_id,
+                            ubicacio   = espaisMap[ev.espai_id]?.ubicacio.orEmpty(),
                             perInfants = ev.per_infants
                                  )
                     }
@@ -134,19 +134,56 @@ class fragmentIniciAdmin : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun aplicarFiltro() {
         val selected = spinnerFiltro.selectedItem as String
-
         val hoy = LocalDate.now()
-        val sieteDias = hoy.plusDays(7)
         val fmt = DateTimeFormatter.ISO_LOCAL_DATE
 
         val filtered = when (selected) {
-            "Per infants" -> allItems.filter { it.perInfants }
-            "Events pròxims" -> { allItems.filter { ev ->
-                val fecha = LocalDate.parse(ev.dataInici, fmt)
-                !fecha.isBefore(hoy) && !fecha.isAfter(sieteDias)
-            }}
-            else           -> allItems
+            "Tots" -> {
+                // Solo eventos cuya fecha de inicio >= hoy
+                allItems.filter { ev ->
+                    // 1) Tomamos "YYYY-MM-DD" antes de espacio o 'T'
+                    val dateOnly = ev.dataInici
+                        .substringBefore(" ")
+                        .substringBefore("T")
+                    // 2) Parseamos y comparamos
+                    LocalDate.parse(dateOnly, fmt).run { !isBefore(hoy) }
+                }
+            }
+            "Per infants" -> {
+                // Solo infantiles cuya fecha de inicio >= hoy
+                allItems.filter { ev ->
+                    ev.perInfants && run {
+                        val dateOnly = ev.dataInici
+                            .substringBefore(" ")
+                            .substringBefore("T")
+                        LocalDate.parse(dateOnly, fmt).run { !isBefore(hoy) }
+                    }
+                }
+            }
+            "Events pròxims" -> {
+                // ... tu código actual para próximos 7 días ...
+                val sieteDias = hoy.plusDays(7)
+                allItems.filter { ev ->
+                    val dateOnly = ev.dataInici
+                        .substringBefore(" ")
+                        .substringBefore("T")
+                    val d = LocalDate.parse(dateOnly, fmt)
+                    !d.isBefore(hoy) && !d.isAfter(sieteDias)
+                }
+            }
+            "Events Anteriors" -> {
+                allItems.filter { ev ->
+                    val dateOnly = ev.dataInici
+                        .substringBefore(" ")
+                        .substringBefore("T")
+                    LocalDate.parse(dateOnly, fmt).isBefore(hoy)
+                }
+            }
+            else -> emptyList()
         }
+
         rvEvents.adapter = EventsAdapter(filtered)
     }
+
+
 }
