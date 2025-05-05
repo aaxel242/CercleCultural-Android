@@ -39,9 +39,15 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         currentUserId = arguments?.getInt("userId", -1) ?: -1
+        Log.d("ChatDebug", "User ID: $currentUserId") // Verificar ID
+
+        // Inicializar SocketManager con el lifecycle
+        socketManager = SocketManager(this).apply {
+            connect()
+        }
+
         setupRecyclerView()
         loadMessages()
-        setupSocket()
         setupClickListeners()
     }
 
@@ -123,5 +129,6 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
         super.onDestroyView()
         socketManager.disconnect()
         _binding = null
+        Log.d("ChatDebug", "Fragment destroyed") // Verificar ciclo de vida
     }
 }
