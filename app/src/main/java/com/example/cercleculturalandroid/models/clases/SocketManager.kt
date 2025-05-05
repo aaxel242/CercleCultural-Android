@@ -25,13 +25,14 @@ class SocketManager(private val messageListener: MessageListener?) {
     fun connect() {
         executor.execute {
             try {
-                socket = Socket(
-                    SERVER_IP, SERVER_PORT
-                               )
+                println("DEBUG: Intentando conectar a $SERVER_IP:$SERVER_PORT")
+                socket = Socket(SERVER_IP, SERVER_PORT)
+                println("DEBUG: Conexión exitosa")
                 out = PrintWriter(socket!!.getOutputStream(), true)
                 `in` = BufferedReader(InputStreamReader(socket!!.getInputStream()))
                 startListening()
             } catch (e: IOException) {
+                println("DEBUG: Error de conexión: ${e.message}")
                 messageListener?.onError("Error de conexión: " + e.message)
             }
         }
@@ -97,7 +98,7 @@ class SocketManager(private val messageListener: MessageListener?) {
     }
 
     companion object {
-        private const val SERVER_IP = "192.168.1.100" // Cambiar por IP del servidor
+        private const val SERVER_IP = "10.0.0.121"
         private const val SERVER_PORT = 8888
     }
 }

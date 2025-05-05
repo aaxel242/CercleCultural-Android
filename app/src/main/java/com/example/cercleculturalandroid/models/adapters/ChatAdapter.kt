@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cercleculturalandroid.R
 import com.example.cercleculturalandroid.models.clases.Mensajes
 import java.text.SimpleDateFormat
-import java.util.Locale
+import java.util.*
 
 class ChatAdapter(
     private val mensajes: MutableList<Mensajes>,
@@ -64,9 +64,9 @@ class ChatAdapter(
         notifyItemInserted(mensajes.size - 1)
     }
 
-    fun updateData(newMensajes: List<Mensajes>) {
+    fun setMessages(newMessages: List<Mensajes>) {
         mensajes.clear()
-        mensajes.addAll(newMensajes)
+        mensajes.addAll(newMessages)
         notifyDataSetChanged()
     }
 
