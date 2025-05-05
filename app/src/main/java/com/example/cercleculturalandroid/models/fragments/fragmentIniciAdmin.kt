@@ -137,53 +137,51 @@ class fragmentIniciAdmin : Fragment() {
         val hoy = LocalDate.now()
         val fmt = DateTimeFormatter.ISO_LOCAL_DATE
 
+        Log.d("FILTRO", "Fecha actual: $hoy")
+
         val filtered = when (selected) {
-            "Tots" -> {
-                // Solo eventos cuya fecha de inicio >= hoy
-                allItems.filter { ev ->
-                    // 1) Tomamos "YYYY-MM-DD" antes de espacio o 'T'
-                    val dateOnly = ev.dataInici
-                        .substringBefore(" ")
-                        .substringBefore("T")
-                    // 2) Parseamos y comparamos
-                    LocalDate.parse(dateOnly, fmt).run { !isBefore(hoy) }
-                }
+            "Tots" -> allItems.filter {
+                Log.d("FILTRO", "Evento: ${it.nom} - Fecha: ${it.dataInici}")
+                esEventoFuturo(it, hoy, fmt)
             }
-            "Per infants" -> {
-                // Solo infantiles cuya fecha de inicio >= hoy
-                allItems.filter { ev ->
-                    ev.perInfants && run {
-                        val dateOnly = ev.dataInici
-                            .substringBefore(" ")
-                            .substringBefore("T")
-                        LocalDate.parse(dateOnly, fmt).run { !isBefore(hoy) }
-                    }
-                }
+            "Per infants" -> allItems.filter {
+                it.perInfants && esEventoFuturo(it, hoy, fmt)
             }
             "Events pròxims" -> {
-                // ... tu código actual para próximos 7 días ...
                 val sieteDias = hoy.plusDays(7)
-                allItems.filter { ev ->
-                    val dateOnly = ev.dataInici
-                        .substringBefore(" ")
-                        .substringBefore("T")
-                    val d = LocalDate.parse(dateOnly, fmt)
-                    !d.isBefore(hoy) && !d.isAfter(sieteDias)
-                }
+                allItems.filter { esEventoProximo(it, hoy, sieteDias, fmt) }
             }
-            "Events Anteriors" -> {
-                allItems.filter { ev ->
-                    val dateOnly = ev.dataInici
-                        .substringBefore(" ")
-                        .substringBefore("T")
-                    LocalDate.parse(dateOnly, fmt).isBefore(hoy)
-                }
-            }
+            "Events Anteriors" -> allItems.filter { esEventoAnterior(it, hoy, fmt) }
             else -> emptyList()
         }
 
+        Log.d("FILTRO", "Eventos filtrados: ${filtered.size}")
         rvEvents.adapter = EventsAdapter(filtered)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun esEventoFuturo(evento: EventItem, hoy: LocalDate, fmt: DateTimeFormatter): Boolean {
+        return try {
+            val dateOnly = evento.dataInici.substringBefore(" ").substringBefore("T")
+            val fechaEvento = LocalDate.parse(dateOnly, fmt)
+            !fechaEvento.isBefore(hoy)
+        } catch (e: Exception) {
+            Log.e("FILTRO", "Error al parsear fecha: ${evento.dataInici}", e)
+            false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun esEventoProximo(evento: EventItem, hoy: LocalDate, sieteDias: LocalDate, fmt: DateTimeFormatter): Boolean {
+        val dateOnly = evento.dataInici.substringBefore(" ").substringBefore("T")
+        val fechaEvento = LocalDate.parse(dateOnly, fmt)
+        return !fechaEvento.isBefore(hoy) && !fechaEvento.isAfter(sieteDias)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun esEventoAnterior(evento: EventItem, hoy: LocalDate, fmt: DateTimeFormatter): Boolean {
+        val dateOnly = evento.dataInici.substringBefore(" ").substringBefore("T")
+        return LocalDate.parse(dateOnly, fmt).isBefore(hoy)
+    }
 
 }

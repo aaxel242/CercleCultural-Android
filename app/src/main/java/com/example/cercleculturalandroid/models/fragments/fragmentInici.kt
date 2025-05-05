@@ -134,19 +134,54 @@ class fragmentInici : Fragment() {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun aplicarFiltro() {
         val selected = spinnerFiltro.selectedItem as String
-
         val hoy = LocalDate.now()
-        val sieteDias = hoy.plusDays(7)
         val fmt = DateTimeFormatter.ISO_LOCAL_DATE
 
+        Log.d("FILTRO", "Fecha actual: $hoy")
+
         val filtered = when (selected) {
-            "Per infants" -> allItems.filter { it.perInfants }
-            "Events pròxims" -> { allItems.filter { ev ->
-                val fecha = LocalDate.parse(ev.dataInici, fmt)
-                !fecha.isBefore(hoy) && !fecha.isAfter(sieteDias)
-            }}
-            else           -> allItems
+            "Tots" -> allItems.filter {
+                Log.d("FILTRO", "Evento: ${it.nom} - Fecha: ${it.dataInici}")
+                esEventoFuturo(it, hoy, fmt)
+            }
+            "Per infants" -> allItems.filter {
+                it.perInfants && esEventoFuturo(it, hoy, fmt)
+            }
+            "Events pròxims" -> {
+                val sieteDias = hoy.plusDays(7)
+                allItems.filter { esEventoProximo(it, hoy, sieteDias, fmt) }
+            }
+            "Events Anteriors" -> allItems.filter { esEventoAnterior(it, hoy, fmt) }
+            else -> emptyList()
         }
+
+        Log.d("FILTRO", "Eventos filtrados: ${filtered.size}")
         rvEvents.adapter = EventsAdapter(filtered)
     }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun esEventoFuturo(evento: EventItem, hoy: LocalDate, fmt: DateTimeFormatter): Boolean {
+        return try {
+            val dateOnly = evento.dataInici.substringBefore(" ").substringBefore("T")
+            val fechaEvento = LocalDate.parse(dateOnly, fmt)
+            !fechaEvento.isBefore(hoy)
+        } catch (e: Exception) {
+            Log.e("FILTRO", "Error al parsear fecha: ${evento.dataInici}", e)
+            false
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun esEventoProximo(evento: EventItem, hoy: LocalDate, sieteDias: LocalDate, fmt: DateTimeFormatter): Boolean {
+        val dateOnly = evento.dataInici.substringBefore(" ").substringBefore("T")
+        val fechaEvento = LocalDate.parse(dateOnly, fmt)
+        return !fechaEvento.isBefore(hoy) && !fechaEvento.isAfter(sieteDias)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun esEventoAnterior(evento: EventItem, hoy: LocalDate, fmt: DateTimeFormatter): Boolean {
+        val dateOnly = evento.dataInici.substringBefore(" ").substringBefore("T")
+        return LocalDate.parse(dateOnly, fmt).isBefore(hoy)
+    }
+
 }

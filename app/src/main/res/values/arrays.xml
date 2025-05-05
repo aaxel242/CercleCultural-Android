@@ -2,9 +2,9 @@
 <resources>
     <string-array name="filtro_menu">
         <item>Tots</item>
-        <item>Events pròxims</item>
+        <item>Pròxims</item>
         <item>Per infants</item>
-        <item>Events Anteriors</item>
+        <item>Anteriors</item>
 
     </string-array>
 </resources>
