@@ -147,11 +147,11 @@ class fragmentIniciAdmin : Fragment() {
             "Per infants" -> allItems.filter {
                 it.perInfants && esEventoFuturo(it, hoy, fmt)
             }
-            "Events pròxims" -> {
+            "Pròxims" -> {
                 val sieteDias = hoy.plusDays(7)
                 allItems.filter { esEventoProximo(it, hoy, sieteDias, fmt) }
             }
-            "Events Anteriors" -> allItems.filter { esEventoAnterior(it, hoy, fmt) }
+            "Anteriors" -> allItems.filter { esEventoAnterior(it, hoy, fmt) }
             else -> emptyList()
         }
 
