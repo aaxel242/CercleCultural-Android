@@ -68,6 +68,7 @@ class IniciarSesionActivity : AppCompatActivity() {
                                 // Lanzar MainActivity con flag
                                 val intent = Intent(this@IniciarSesionActivity, MainActivity::class.java)
                                 intent.putExtra("isAdmin", isAdmin)
+                                intent.putExtra("userId", usuari.id)
                                 startActivity(intent)
                                 finish()
                             } else {
@@ -96,13 +97,6 @@ class IniciarSesionActivity : AppCompatActivity() {
                     }
                 })
             }
-        }
-
-        logoAdmin.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            intent.putExtra("isAdmin", true)
-            startActivity(intent)
-            finish()
         }
     }
 }

@@ -25,8 +25,8 @@ public interface ApiService {
     @GET("api/Usuaris")
     Call<List<Usuari>> getUsuaris();
 
-    @GET("api/Mensajes/{id}")
-    Call<Mensajes> getMensaje(@Path("id") int id);
+    @GET("api/Mensajes")
+    Call<List<Mensajes>> getMensaje();
 
     @POST("api/Mensajes")
     Call<Mensajes> postMensaje(@Body Mensajes mensaje);
