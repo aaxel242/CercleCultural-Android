@@ -137,26 +137,21 @@ class fragmentInici : Fragment() {
         val hoy = LocalDate.now()
         val fmt = DateTimeFormatter.ISO_LOCAL_DATE
 
-        Log.d("FILTRO", "Fecha actual: $hoy")
-
         val filtered = when (selected) {
-            "Tots" -> allItems.filter {
-                Log.d("FILTRO", "Evento: ${it.nom} - Fecha: ${it.dataInici}")
-                esEventoFuturo(it, hoy, fmt)
-            }
-            "Per infants" -> allItems.filter {
-                it.perInfants && esEventoFuturo(it, hoy, fmt)
-            }
+            "Tots" -> allItems.filter { esEventoFuturo(it, hoy, fmt) }
+            "Per infants" -> allItems.filter { it.perInfants && esEventoFuturo(it, hoy, fmt) }
             "Events pròxims" -> {
                 val sieteDias = hoy.plusDays(7)
                 allItems.filter { esEventoProximo(it, hoy, sieteDias, fmt) }
             }
             "Events Anteriors" -> allItems.filter { esEventoAnterior(it, hoy, fmt) }
-            else -> emptyList()
+            else -> allItems
         }
 
-        Log.d("FILTRO", "Eventos filtrados: ${filtered.size}")
-        rvEvents.adapter = EventsAdapter(filtered)
+        rvEvents.adapter = EventsAdapter(filtered) { evento ->
+            seleccionarEvento(evento)
+
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -184,4 +179,20 @@ class fragmentInici : Fragment() {
         return LocalDate.parse(dateOnly, fmt).isBefore(hoy)
     }
 
+    private fun seleccionarEvento(evento: EventItem) {
+        // Prepara el Bundle con el objeto Parcelable
+        val bundle = Bundle().apply {
+            putParcelable("evento", evento)
+        }
+
+        // Crea e inicia fragmentReservar
+        val fr = fragmentReservar().apply {
+            arguments = bundle
+        }
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.flFragment, fr)
+            .addToBackStack(null)
+            .commit()
+    }
 }

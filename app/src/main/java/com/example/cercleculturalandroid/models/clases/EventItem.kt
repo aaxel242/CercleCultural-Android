@@ -1,12 +1,15 @@
 package com.example.cercleculturalandroid.models.clases
 
-data class EventItem (
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+data class EventItem(
     val id: Int,
     val nom: String,
     val descripcio: String,
     val dataInici: String,
     val espai_id: Int,
     val ubicacio: String,
-    //val imatge: String?,
     val perInfants: Boolean
-                     )
+                    ) : Parcelable

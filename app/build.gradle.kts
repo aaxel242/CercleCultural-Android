@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -41,14 +42,27 @@ android {
 
 dependencies {
 
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation (libs.retrofit)
+    //noinspection UseTomlInstead
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.airbnb.android:lottie:6.0.0")
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.constraintlayout)
+    implementation (libs.lottie)
+    implementation (libs.androidx.core.ktx)
+    implementation (libs.androidx.appcompat)
+    implementation (libs.material)
+    implementation (libs.androidx.activity)
+    implementation (libs.androidx.constraintlayout)
+
+    // libGDX core y backend Android
+    implementation (libs.gdx)
+    implementation (libs.gdx.backend.android)
+    implementation (libs.gdx.box2d)
+
+    // Sólo los natives soportados por Android (no natives-armeabi)
+    implementation (libs.com.badlogicgames.gdx.gdx.box2d.platform)
+    implementation (libs.com.badlogicgames.gdx.gdx.box2d.platform)
+    implementation (libs.com.badlogicgames.gdx.gdx.box2d.platform)
+    implementation (libs.com.badlogicgames.gdx.gdx.box2d.platform)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
