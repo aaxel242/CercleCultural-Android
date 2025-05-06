@@ -179,7 +179,7 @@ class fragmentIniciAdmin : Fragment() {
     }
 
     private fun seleccionarEvento(evento: EventItem) {
-        // Prepara el Bundle con el objeto Parcelable
+        // Prepara el Bundle con el objeto Parcelableytuy
         val bundle = Bundle().apply {
             putParcelable("evento", evento)
         }
