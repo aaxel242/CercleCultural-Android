@@ -64,7 +64,7 @@ class ChatAdapter(
         notifyItemInserted(mensajes.size - 1)
     }
 
-    fun setMessages(newMessages: List<Mensajes>) {
+    fun updateMessages(newMessages: MutableList<Mensajes>) {
         mensajes.clear()
         mensajes.addAll(newMessages)
         notifyDataSetChanged()
