@@ -1,22 +1,23 @@
 package com.example.cercleculturalandroid.models.clases
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.InputStreamReader
 import java.io.PrintWriter
 import java.net.Socket
-import java.util.*
+import java.util.Date
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.concurrent.atomic.AtomicBoolean
 
-class SocketManager(private val messageListener: MessageListener?) {
+class SocketManager(private var messageListener: MessageListener?) {
 
     interface MessageListener {
         fun onMessageReceived(mensaje: Mensajes)
+        fun onConnectionStatusChanged(connected: Boolean)
         fun onError(error: String)
     }
 
@@ -30,7 +31,7 @@ class SocketManager(private val messageListener: MessageListener?) {
     private var socket: Socket? = null
     private var out: PrintWriter? = null
     private var input: BufferedReader? = null
-    private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+    private val executor: ExecutorService = Executors.newFixedThreadPool(2)
     private val isConnected = AtomicBoolean(false)
     private val handler = Handler(Looper.getMainLooper())
 
@@ -39,19 +40,24 @@ class SocketManager(private val messageListener: MessageListener?) {
             try {
                 if (isConnected.get()) return@execute
 
-                Log.d(TAG, "Connecting to $SERVER_IP:$SERVER_PORT")
-                socket = Socket(SERVER_IP, SERVER_PORT)
-                socket?.let {
-                    out = PrintWriter(it.getOutputStream(), true)
-                    input = BufferedReader(InputStreamReader(it.inputStream))
-                    isConnected.set(true)
-                    Log.d(TAG, "Connected successfully")
-                    startListening()
+                Log.d(TAG, "Connecting...")
+                socket = Socket(SERVER_IP, SERVER_PORT).apply {
+                    keepAlive = true
+                    soTimeout = 15000
                 }
+                out = PrintWriter(socket!!.getOutputStream(), true)
+                input = BufferedReader(InputStreamReader(socket!!.inputStream))
+                isConnected.set(true)
+                Log.d(TAG, "Connected!")
+                handler.post { messageListener?.onConnectionStatusChanged(true) }
+                startListening()
             } catch (e: Exception) {
-                Log.e(TAG, "Connection error: ${e.message}")
-                handler.postDelayed({ connect() }, RECONNECT_DELAY)
-                notifyError("Connection error: ${e.message}")
+                Log.e(TAG, "Connection failed: ${e.message}")
+                handler.post {
+                    messageListener?.onError("Connection error: ${e.message}")
+                    messageListener?.onConnectionStatusChanged(false)
+                }
+                scheduleReconnect()
             }
         }
     }
@@ -60,77 +66,89 @@ class SocketManager(private val messageListener: MessageListener?) {
         executor.execute {
             try {
                 while (isConnected.get()) {
-                    val message = input?.readLine() ?: break
-                    Log.d(TAG, "Received raw message: $message")
+                    val message = input?.readLine() ?: throw Exception("Stream closed")
+                    Log.d(TAG, "Raw message: $message")
                     parseMessage(message)?.let {
                         handler.post { messageListener?.onMessageReceived(it) }
                     }
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "Listening error: ${e.message}")
+                Log.e(TAG, "Listen error: ${e.message}")
                 disconnect()
-                notifyError("Connection lost: ${e.message}")
+                handler.post {
+                    messageListener?.onError("Connection lost")
+                    messageListener?.onConnectionStatusChanged(false)
+                }
+                scheduleReconnect()
             }
         }
     }
 
     fun sendMessage(mensaje: Mensajes) {
         executor.execute {
+            if (!isConnected.get()) {
+                handler.post { messageListener?.onError("Not connected") }
+                return@execute
+            }
             try {
-                if (isConnected.get()) {
-                    val formatted = formatMessage(mensaje)
-                    Log.d(TAG, "Sending message: $formatted")
-                    out?.println(formatted)
-                }
+                out?.println(formatMessage(mensaje))
+                Log.d(TAG, "Message sent")
             } catch (e: Exception) {
-                Log.e(TAG, "Send error: ${e.message}")
-                notifyError("Failed to send message")
+                Log.e(TAG, "Send failed: ${e.message}")
+                handler.post { messageListener?.onError("Send failed") }
             }
         }
     }
 
     fun disconnect() {
-        try {
-            isConnected.set(false)
-            input?.close()
-            out?.close()
-            socket?.close()
-            executor.shutdown()
-            Log.d(TAG, "Disconnected successfully")
-        } catch (e: Exception) {
-            Log.e(TAG, "Disconnection error: ${e.message}")
+        executor.execute {
+            try {
+                if (isConnected.compareAndSet(true, false)) { // Asegura una sola ejecución
+                    input?.close()
+                    out?.close()
+                    socket?.close()
+                    handler.post {
+                        messageListener?.onConnectionStatusChanged(false)
+                    }
+                    Log.d(TAG, "Desconexión exitosa")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error al desconectar: ${e.message}")
+            }
+        }
+    }
+
+    private fun scheduleReconnect() {
+        if (!isConnected.get()) { // Solo reconecta si está desconectado
+            handler.postDelayed({ connect() }, RECONNECT_DELAY)
         }
     }
 
     private fun formatMessage(mensaje: Mensajes): String {
         return listOf(
-            mensaje.id.toString(),
+            "0",
             mensaje.usuari_id.toString(),
             mensaje.nom_usuari,
             mensaje.missatge,
-            mensaje.dataEnviament.time.toString()
+            "0"
                      ).joinToString("|")
     }
 
     private fun parseMessage(message: String): Mensajes? {
         return try {
             val parts = message.split("|")
-            if (parts.size != 5) throw IllegalArgumentException("Invalid message format")
+            if (parts.size != 5) throw Exception("Invalid format")
 
-            Mensajes().apply {
-                id = parts[0].toInt()
-                usuari_id = parts[1].toInt()
-                nom_usuari = parts[2]
-                missatge = parts[3]
-                dataEnviament = Date(parts[4].toLong())
-            }
+            Mensajes(
+                id = parts[0],
+                usuari_id = parts[1].toInt(),
+                nom_usuari = parts[2],
+                missatge = parts[3],
+                dataEnviament = Date() // Usar fecha del servidor
+                    )
         } catch (e: Exception) {
-            Log.e(TAG, "Message parsing error: ${e.message}")
+            Log.e(TAG, "Parse error: ${e.message}")
             null
         }
-    }
-
-    private fun notifyError(error: String) {
-        handler.post { messageListener?.onError(error) }
     }
 }

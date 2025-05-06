@@ -9,6 +9,7 @@
     android:background="@color/fondo">
 
     <!-- Header -->
+
     <TextView
         android:id="@+id/tvHeader"
         android:layout_width="match_parent"
