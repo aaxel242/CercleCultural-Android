@@ -1,16 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
+<!-- fragment_reservar.xml -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/llReservarContainer"
-    android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:weightSum="10">
 
-    <fragment
-        android:id="@+id/fragment_seats"
-        android:name="com.example.cercleculturalandroid.models.fragments.fragmentGdx"
+    <FrameLayout
+        android:id="@+id/gdx_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1" />
+        android:layout_height="600dp"
+        android:background="@android:color/holo_red_dark"/>
 
+    <!-- Espacio para otros elementos -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="3"
+        android:text="Controles aquí"/>
 </LinearLayout>

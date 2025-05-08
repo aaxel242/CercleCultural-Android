@@ -21,4 +21,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "Cercle Cultural Android"
 include(":app")
+include(":core", ":android")
+
+
  
