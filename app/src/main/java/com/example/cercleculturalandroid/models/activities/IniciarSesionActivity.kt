@@ -69,6 +69,7 @@ class IniciarSesionActivity : AppCompatActivity() {
                                 val intent = Intent(this@IniciarSesionActivity, MainActivity::class.java)
                                 intent.putExtra("isAdmin", isAdmin)
                                 intent.putExtra("userId", usuari.id)
+                                intent.putExtra("userName", usuari.nom)
                                 startActivity(intent)
                                 finish()
                             } else {

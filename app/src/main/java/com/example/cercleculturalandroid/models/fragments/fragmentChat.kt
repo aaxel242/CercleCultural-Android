@@ -10,10 +10,15 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cercleculturalandroid.api.ApiService
+import com.example.cercleculturalandroid.api.RetrofitClient
 import com.example.cercleculturalandroid.databinding.FragmentChatBinding
 import com.example.cercleculturalandroid.models.adapters.ChatAdapter
 import com.example.cercleculturalandroid.models.clases.Mensajes
 import com.example.cercleculturalandroid.models.clases.SocketManager
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.Date
 
 class fragmentChat : Fragment(), SocketManager.MessageListener {
@@ -22,35 +27,60 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
     private val binding get() = _binding!!
     private lateinit var chatAdapter: ChatAdapter
     private val userId by lazy { arguments?.getInt("userId") ?: -1 }
+    private val userName by lazy { arguments?.getString("userName") ?: "Usuari" }
+    private val apiService: ApiService = RetrofitClient.getClient().create(ApiService::class.java)
 
-    // ViewModel personalizado
-    class ChatViewModel(private val listener: SocketManager.MessageListener) : ViewModel() {
+    class ChatViewModel(
+        private val listener: SocketManager.MessageListener,
+        private val apiService: ApiService
+                       ) : ViewModel() {
         val socketManager = SocketManager(listener).apply { connect() }
 
         fun loadInitialMessages(callback: (List<Mensajes>) -> Unit) {
-            // Simular carga de mensajes desde API
-            val mockMessages = listOf(
-                Mensajes("1", 1, "Sistema", "Bienvenido al chat", Date()),
-                Mensajes("2", 2, "Soporte", "¿En qué podemos ayudarte?", Date())
-                                     )
-            callback(mockMessages)
+            apiService.getMensajes().enqueue(object : Callback<List<Mensajes>> {
+                override fun onResponse(call: Call<List<Mensajes>>, response: Response<List<Mensajes>>) {
+                    if (response.isSuccessful) {
+                        callback(response.body() ?: emptyList())
+                    } else {
+                        listener.onError("Error cargando mensajes: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Mensajes>>, t: Throwable) {
+                    listener.onError("Error de conexión: ${t.message}")
+                }
+            })
+        }
+
+        fun sendMessageToApi(mensaje: Mensajes) {
+            apiService.postMensaje(mensaje).enqueue(object : Callback<Mensajes> {
+                override fun onResponse(call: Call<Mensajes>, response: Response<Mensajes>) {
+                    if (!response.isSuccessful) {
+                        listener.onError("Error al guardar mensaje: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<Mensajes>, t: Throwable) {
+                    listener.onError("Error de red: ${t.message}")
+                }
+            })
         }
     }
 
-    // Factory para el ViewModel
     class ChatViewModelFactory(
-        private val listener: SocketManager.MessageListener
+        private val listener: SocketManager.MessageListener,
+        private val apiService: ApiService
                               ) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(ChatViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
-                return ChatViewModel(listener) as T
+                return ChatViewModel(listener, apiService) as T
             }
             throw IllegalArgumentException("ViewModel class no reconocida")
         }
     }
 
-    private val viewModel: ChatViewModel by viewModels { ChatViewModelFactory(this) }
+    private val viewModel: ChatViewModel by viewModels { ChatViewModelFactory(this, apiService) }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,16 +133,18 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
 
     private fun sendMessageToServer(text: String) {
         val newMessage = Mensajes(
-            id = "", // El servidor asignará ID
+            id = "",
             usuari_id = userId,
-            nom_usuari = "Usuario", // Reemplazar con nombre real del usuario
+            nom_usuari = userName,
             missatge = text,
             dataEnviament = Date()
                                  )
+
+        // Envía a través de Socket y guarda en la API
         viewModel.socketManager.sendMessage(newMessage)
+        viewModel.sendMessageToApi(newMessage)
     }
 
-    // SocketManager.MessageListener implementations
     override fun onMessageReceived(mensaje: Mensajes) {
         activity?.runOnUiThread {
             chatAdapter.addMessage(mensaje)
@@ -137,7 +169,6 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
         binding.rvMensajesChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
     }
 
-    // En fragmentChat.kt
     override fun onDestroyView() {
         super.onDestroyView()
         disconnectFromServer()
@@ -146,7 +177,7 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
 
     override fun onPause() {
         super.onPause()
-        if (isRemoving) { // Solo si el fragmento está siendo eliminado
+        if (isRemoving) {
             disconnectFromServer()
         }
     }
