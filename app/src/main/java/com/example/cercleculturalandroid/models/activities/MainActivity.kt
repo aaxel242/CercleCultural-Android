@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
     private var isAdmin = false
     private var userId: Int = -1
+    private var userName: String = "Usuari"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,6 +24,7 @@ class MainActivity : AppCompatActivity() {
         // Recupera extra de la condicion de admin
         isAdmin = intent.getBooleanExtra("isAdmin", false)
         userId = intent.getIntExtra("userId", -1)
+        userName = intent.getStringExtra("userName").toString()
 
         // Configurar BottomNavigationView
         bottomNavigationView = findViewById(R.id.bottom_navigation)
@@ -41,7 +43,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.chat -> {
                     val chatFragment = fragmentChat().apply {
                         arguments = Bundle().apply {
-                            putInt("userId", userId) // Enviamos el ID al fragmento
+                            putInt("userId", userId)
+                            putString("userName", userName) // Enviamos el ID al fragmento
                         }
                     }
                     reemplazarFragmento(chatFragment, false)

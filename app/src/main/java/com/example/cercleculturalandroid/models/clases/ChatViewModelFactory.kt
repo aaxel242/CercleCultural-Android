@@ -11,7 +11,9 @@ class ChatViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(fragmentChat.ChatViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return fragmentChat.ChatViewModel(listener) as T // Pasar el listener
+            return fragmentChat.ChatViewModel(
+                listener, apiService = TODO()
+                                             ) as T // Pasar el listener
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
