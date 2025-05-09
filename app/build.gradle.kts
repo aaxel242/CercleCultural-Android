@@ -53,16 +53,12 @@ dependencies {
     implementation (libs.androidx.activity)
     implementation (libs.androidx.constraintlayout)
 
-    // libGDX core y backend Android
-    implementation (libs.gdx)
-    implementation (libs.gdx.backend.android)
-    implementation (libs.gdx.box2d)
 
-    // Sólo los natives soportados por Android (no natives-armeabi)
-    implementation (libs.com.badlogicgames.gdx.gdx.box2d.platform)
-    implementation (libs.com.badlogicgames.gdx.gdx.box2d.platform)
-    implementation (libs.com.badlogicgames.gdx.gdx.box2d.platform)
-    implementation (libs.com.badlogicgames.gdx.gdx.box2d.platform)
+    implementation ("com.badlogicgames.gdx:gdx:1.11.0")
+    implementation ("com.badlogicgames.gdx:gdx-backend-android:1.11.0")
+    implementation ("com.badlogicgames.gdx:gdx-box2d:1.11.0")
+
+
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

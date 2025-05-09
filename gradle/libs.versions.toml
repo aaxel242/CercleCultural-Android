@@ -1,6 +1,9 @@
 [versions]
 agp = "8.8.0"
+gdx = "1.11.0"
 badlogicgamesGdxBox2dPlatform = "1.11.0"
+fragmentKtxVersion = "1.5.5"
+gdxBackendAndroid = "1.11.0"
 kotlin = "1.9.24"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -15,7 +18,9 @@ retrofit = "2.9.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+badlogic-gdx-backend-android = { module = "com.badlogic.gdx:gdx-backend-android", version.ref = "gdxBackendAndroid" }
 com-badlogicgames-gdx-gdx-box2d-platform = { module = "com.badlogicgames.gdx:gdx-box2d-platform", version.ref = "badlogicgamesGdxBox2dPlatform" }
+fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
 gdx = { module = "com.badlogicgames.gdx:gdx", version.ref = "badlogicgamesGdxBox2dPlatform" }
 gdx-backend-android = { module = "com.badlogicgames.gdx:gdx-backend-android", version.ref = "badlogicgamesGdxBox2dPlatform" }
 gdx-box2d = { module = "com.badlogicgames.gdx:gdx-box2d", version.ref = "badlogicgamesGdxBox2dPlatform" }

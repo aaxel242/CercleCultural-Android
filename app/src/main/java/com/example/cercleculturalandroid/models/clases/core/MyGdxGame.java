@@ -1,9 +1,12 @@
 package com.example.cercleculturalandroid.models.clases.core;
 
+import static android.graphics.Color.WHITE;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
@@ -12,6 +15,9 @@ import java.util.List;
 
 public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
+	private OrthographicCamera camera;
+	private static final float VIRTUAL_WIDTH = 1280;
+	private static final float VIRTUAL_HEIGHT = 720;
 	private SpriteBatch batch;
 	private Texture texAvailable;
 	private Texture texSelected;
@@ -29,11 +35,13 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
 	@Override
 	public void create() {
+		Gdx.app.log("GDX", "Inicializando juego");
 		batch = new SpriteBatch();
-		Gdx.input.setInputProcessor(this);
+		camera = new OrthographicCamera();
+		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		texAvailable = new Texture("imgButaca.png");
-		texSelected = new Texture("imgButacaSelected.png");
+		texAvailable = new Texture(Gdx.files.internal("imgbutaca.png"));
+		texSelected = new Texture("imgbutacaselected.png");
 
 		float totalGridWidth = COLS * SEAT_WIDTH + (COLS - 1) * PADDING;
 		START_X = (Gdx.graphics.getWidth() - totalGridWidth) / 2f;
@@ -59,8 +67,35 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	}
 
 	@Override
+	public void resize(int width, int height) {
+		// 1. Configurar vista de la cámara
+		camera.setToOrtho(false, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+
+		// 2. Recalcular posiciones relativas
+		float centerX = VIRTUAL_WIDTH / 2f;
+		float startY = VIRTUAL_HEIGHT * 0.7f;
+
+		float gridWidth = COLS * SEAT_WIDTH + (COLS - 1) * PADDING;
+		START_X = centerX - (gridWidth / 2f);
+
+		// 3. Actualizar todas las butacas
+		for (int r = 0; r < ROWS; r++) {
+			for (int c = 0; c < COLS; c++) {
+				Seat seat = seats.get(r * COLS + c);
+				seat.x = START_X + c * (SEAT_WIDTH + PADDING);
+				seat.y = startY - r * (SEAT_HEIGHT + PADDING);
+			}
+		}
+
+		camera.update(); // <-- ¡Importante!
+	}
+
+	@Override
 	public void render() {
-		Gdx.gl.glClearColor(0.9f, 0.95f, 1f, 1);
+		if (batch == null) {
+			batch = new SpriteBatch();
+		}
+		Gdx.gl.glClearColor(1, 1, 1, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
