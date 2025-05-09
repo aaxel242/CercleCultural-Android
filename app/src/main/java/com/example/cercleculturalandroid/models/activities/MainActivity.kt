@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.inici -> {
-                    // Segun si es admin o no carga el fragmento correspondiente
+                    // si es admin o no carga el fragmento correspondiente
                     if (isAdmin) {
                         reemplazarFragmento(fragmentIniciAdmin(), false)
                     } else {
