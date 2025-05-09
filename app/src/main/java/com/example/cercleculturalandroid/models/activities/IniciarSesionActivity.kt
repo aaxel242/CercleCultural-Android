@@ -80,7 +80,6 @@ class IniciarSesionActivity : AppCompatActivity() {
                                               ).show()
                             }
                         } else {
-                            // Respuesta no exitosa
                             Toast.makeText(
                                 this@IniciarSesionActivity,
                                 "Error al conectar. Código de respuesta: (codi ${response.code()})",

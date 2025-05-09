@@ -1,14 +1,116 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".models.fragments.fragmentUsuario">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    android:fillViewport="true">
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        tools:context=".models.fragments.fragmentUsuario"
+        android:background="@color/fondo"
+        >
 
-</FrameLayout>
+        <ImageView
+            android:id="@+id/logo_admin"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:src="@drawable/img_cc_logo_blanco_y_negro"
+            android:layout_marginTop="70dp"/>
+
+        <Button
+            android:layout_width="250dp"
+            android:layout_height="60dp"
+            android:text="Configuració"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:textColor="@android:color/black"
+            android:backgroundTint="@color/azul"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            android:layout_marginTop="50dp"
+            />
+
+        <TextView
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="Usuari"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:layout_marginTop="20dp"
+            />
+        <EditText
+            android:id="@+id/EditTextUsuari"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:textColor="@android:color/black"
+            android:text="Name Example"
+            android:textSize="20sp"
+            android:enabled="false"
+            android:focusable="false"
+            android:inputType="none"
+            />
+        <TextView
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="Correu"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+
+            />
+        <EditText
+            android:id="@+id/EditTextCorreu"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:textColor="@android:color/black"
+            android:text="example@example.com"
+            android:textSize="20sp"
+            android:enabled="false"
+            android:focusable="false"
+            android:inputType="none"
+            />
+        <TextView
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:text="Data de naixement"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            />
+        <EditText
+            android:id="@+id/EditTextDataNaixement"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:textColor="@android:color/black"
+            android:text="10/07/2005"
+            android:textSize="20sp"
+            android:enabled="false"
+            android:focusable="false"
+            android:inputType="none"
+            />
+
+        <TextView
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:text="Entrades"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            android:layout_marginTop="50dp"
+            android:textAlignment="center"
+            android:background="@color/azul"
+            />
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="300dp"
+            android:layout_height="500dp"
+            android:background="@color/azul"
+            />
+    </LinearLayout>
+</ScrollView>
