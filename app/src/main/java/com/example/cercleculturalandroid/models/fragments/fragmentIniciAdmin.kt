@@ -1,5 +1,6 @@
 package com.example.cercleculturalandroid.models.fragments
 
+import FragmentReservar
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -179,21 +180,12 @@ class fragmentIniciAdmin : Fragment() {
     }
 
     private fun seleccionarEvento(evento: EventItem) {
-        // Prepara el Bundle con el objeto Parcelableytuy
-        val bundle = Bundle().apply {
-            putParcelable("evento", evento)
-        }
-
-        // Crea e inicia fragmentReservar
-        val fr = fragmentReservar().apply {
-            arguments = bundle
-        }
+        val args = Bundle().apply { putParcelable("evento", evento) }
+        val fragment = FragmentReservar().apply { arguments = args }
 
         parentFragmentManager.beginTransaction()
-            .replace(R.id.flFragment, fr)
+            .replace(R.id.flFragment, fragment)
             .addToBackStack(null)
             .commit()
     }
-
-
 }

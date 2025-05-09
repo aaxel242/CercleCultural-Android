@@ -4,18 +4,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="10">
+    android:background="@color/fondo">
 
+    <!-- Título y controles -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Selecciona tu butaca"
+        android:padding="16dp"/>
+
+    <!-- Contenedor LibGDX (Ocupa el 70% de la pantalla) -->
     <FrameLayout
         android:id="@+id/gdx_container"
         android:layout_width="match_parent"
-        android:layout_height="600dp"
-        android:background="@android:color/holo_red_dark"/>
-
-    <!-- Espacio para otros elementos -->
-    <TextView
-        android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3"
-        android:text="Controles aquí"/>
+        android:layout_weight="7"/>
+
+    <!-- Botones de acción -->
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Confirmar"/>
 </LinearLayout>

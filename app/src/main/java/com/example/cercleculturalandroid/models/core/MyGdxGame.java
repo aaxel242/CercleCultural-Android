@@ -1,6 +1,4 @@
-package com.example.cercleculturalandroid.models.clases.core;
-
-import static android.graphics.Color.WHITE;
+package com.example.cercleculturalandroid.models.core;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -9,6 +7,8 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +16,7 @@ import java.util.List;
 public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 
 	private OrthographicCamera camera;
+
 	private static final float VIRTUAL_WIDTH = 1280;
 	private static final float VIRTUAL_HEIGHT = 720;
 	private SpriteBatch batch;
@@ -31,17 +32,18 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 	private static final float SEAT_WIDTH = 120f;
 	private static final float SEAT_HEIGHT = 120f;
 	private float START_X;
+	private Viewport viewport;
+
 	private static final float START_Y = 400f;
 
 	@Override
 	public void create() {
-		Gdx.app.log("GDX", "Inicializando juego");
 		batch = new SpriteBatch();
-		camera = new OrthographicCamera();
-		resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		Gdx.input.setInputProcessor(this);
+		viewport = new FitViewport(VIRTUAL_WIDTH, VIRTUAL_HEIGHT, camera); // Usar FitViewport
 
 		texAvailable = new Texture(Gdx.files.internal("imgbutaca.png"));
-		texSelected = new Texture("imgbutacaselected.png");
+		texSelected = new Texture(Gdx.files.internal("imgbutacaselected.png"));
 
 		float totalGridWidth = COLS * SEAT_WIDTH + (COLS - 1) * PADDING;
 		START_X = (Gdx.graphics.getWidth() - totalGridWidth) / 2f;
@@ -66,11 +68,12 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 		}
 	}
 
+
+
 	@Override
 	public void resize(int width, int height) {
 		// 1. Configurar vista de la cámara
-		camera.setToOrtho(false, VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-
+		viewport.update(width, height, true);
 		// 2. Recalcular posiciones relativas
 		float centerX = VIRTUAL_WIDTH / 2f;
 		float startY = VIRTUAL_HEIGHT * 0.7f;
@@ -86,25 +89,19 @@ public class MyGdxGame extends ApplicationAdapter implements InputProcessor {
 				seat.y = startY - r * (SEAT_HEIGHT + PADDING);
 			}
 		}
-
-		camera.update(); // <-- ¡Importante!
 	}
 
 	@Override
 	public void render() {
-		if (batch == null) {
-			batch = new SpriteBatch();
-		}
-		Gdx.gl.glClearColor(1, 1, 1, 1);
+		Gdx.gl.glClearColor(1, 1, 1, 1); // Blanco
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
+		batch.setProjectionMatrix(camera.combined);
 		batch.begin();
-		for (Seat s : seats) {
-			Texture t = s.state == Seat.State.SELECTED ? texSelected : texAvailable;
-			batch.draw(t, s.x, s.y, SEAT_WIDTH, SEAT_HEIGHT);
-		}
+		// Dibujar butacas...
 		batch.end();
 	}
+
 
 	@Override
 	public void dispose() {

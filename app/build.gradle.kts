@@ -56,7 +56,6 @@ dependencies {
 
     implementation ("com.badlogicgames.gdx:gdx:1.11.0")
     implementation ("com.badlogicgames.gdx:gdx-backend-android:1.11.0")
-    implementation ("com.badlogicgames.gdx:gdx-box2d:1.11.0")
 
 
 

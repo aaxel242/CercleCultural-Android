@@ -1,4 +1,4 @@
-package com.example.cercleculturalandroid.models.clases.core;
+package com.example.cercleculturalandroid.models.core;
 
 public class Seat {
 
