@@ -51,7 +51,12 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.usuari -> {
-                    reemplazarFragmento(fragmentUsuario(), false)
+                    val userFragment = fragmentUsuario().apply {
+                        arguments = Bundle().apply {
+                            putInt("userId", userId)
+                        }
+                    }
+                    reemplazarFragmento(userFragment, false)
                     true
                 }
                 else -> false
