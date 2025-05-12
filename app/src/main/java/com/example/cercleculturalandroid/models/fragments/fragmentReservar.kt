@@ -15,7 +15,7 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Vincula el layout
+        // Vincula el layoutafga
         _binding = FragmentReservarBinding.bind(view)
 
         // Inserta el FragmentGdx en el contenedor
