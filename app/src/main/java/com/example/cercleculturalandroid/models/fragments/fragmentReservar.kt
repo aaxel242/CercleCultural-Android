@@ -1,30 +1,37 @@
+package com.example.cercleculturalandroid
+
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import com.badlogic.gdx.backends.android.AndroidFragmentApplication
-import com.example.cercleculturalandroid.R
-import com.example.cercleculturalandroid.models.fragments.FragmentGdx
+import com.example.cercleculturalandroid.databinding.FragmentReservarBinding
 
-class FragmentReservar : Fragment() {
-    private var gdxFragment: FragmentGdx? = null
+class fragmentReservar : Fragment(R.layout.fragment_reservar) {
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-                             ): View? {
-        return inflater.inflate(R.layout.fragment_reservar, container, false)
-    }
+    // Binding seguro con nullable backing property
+    private var _binding: FragmentReservarBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var gameFragment: fragmentGdx
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Vincula el layout
+        _binding = FragmentReservarBinding.bind(view)
 
-        // Inicializar fragmento LibGDX
-        gdxFragment = FragmentGdx()
+        // Inserta el FragmentGdx en el contenedor
+        gameFragment = fragmentGdx()
         childFragmentManager.beginTransaction()
-            .replace(R.id.gdx_container, gdxFragment!!)
-            .commit()
+            .replace(binding.gdxContainer.id, gameFragment)
+            .commitNow()  // asegura que la vista esté creada antes de interactuar
+
+        // Botón para reservar una butaca de ejemplo
+        binding.btnConfirm.setOnClickListener {
+            gameFragment.reserveSeat(col = 2, row = 1)
+        }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null  // evita fugas del view
     }
 }

@@ -15,9 +15,11 @@ material = "1.12.0"
 activity = "1.10.0"
 constraintlayout = "2.2.0"
 retrofit = "2.9.0"
+jetbrainsKotlinJvm = "1.9.24"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+badlogic-gdx = { module = "com.badlogic.gdx:gdx", version.ref = "gdxBackendAndroid" }
 badlogic-gdx-backend-android = { module = "com.badlogic.gdx:gdx-backend-android", version.ref = "gdxBackendAndroid" }
 com-badlogicgames-gdx-gdx-box2d-platform = { module = "com.badlogicgames.gdx:gdx-box2d-platform", version.ref = "badlogicgamesGdxBox2dPlatform" }
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
@@ -37,4 +39,5 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
 

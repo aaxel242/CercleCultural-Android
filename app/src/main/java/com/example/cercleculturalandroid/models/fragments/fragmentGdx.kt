@@ -1,4 +1,4 @@
-package com.example.cercleculturalandroid.models.fragments
+package com.example.cercleculturalandroid
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -6,21 +6,26 @@ import android.view.View
 import android.view.ViewGroup
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
-import com.example.cercleculturalandroid.models.core.MyGdxGame
+import com.butacas.core.MyGdxGame
 
-class FragmentGdx : AndroidFragmentApplication() { // <-- Herencia correcta
-    private var gameInitialized = false
+class fragmentGdx : AndroidFragmentApplication() {
+    private lateinit var game: MyGdxGame
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
                              ): View {
+        // Instancia y configura el juego
+        game = MyGdxGame()
         val config = AndroidApplicationConfiguration().apply {
-            useImmersiveMode = true
+            useAccelerometer = false
+            useCompass       = false
         }
-        return initializeForView(MyGdxGame(), config)
+        // Devuelve la vista GL embebida
+        return initializeForView(game, config)
     }
 
-    // Ciclo de vida automático (NO necesitas métodos resume/pause manuales)
+    /** Expuesto a la UI Android para reservar butacas */
+    fun reserveSeat(col: Int, row: Int) {
+        game.selectSeat(col, row)
+    }
 }

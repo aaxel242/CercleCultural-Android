@@ -1,6 +1,5 @@
 package com.example.cercleculturalandroid.models.fragments
 
-import FragmentReservar
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -17,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.cercleculturalandroid.R
 import com.example.cercleculturalandroid.api.ApiService
 import com.example.cercleculturalandroid.api.RetrofitClient
+import com.example.cercleculturalandroid.fragmentReservar
 import com.example.cercleculturalandroid.models.adapters.EventsAdapter
 import com.example.cercleculturalandroid.models.clases.Eventos
 import com.example.cercleculturalandroid.models.clases.Espai
@@ -182,7 +182,7 @@ class fragmentInici : Fragment() {
 
     private fun seleccionarEvento(evento: EventItem) {
         val args = Bundle().apply { putParcelable("evento", evento) }
-        val fragment = FragmentReservar().apply { arguments = args }
+        val fragment = fragmentReservar().apply { arguments = args }
 
         parentFragmentManager.beginTransaction()
             .replace(R.id.flFragment, fragment)

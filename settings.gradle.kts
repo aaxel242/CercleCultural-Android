@@ -1,27 +1,17 @@
 pluginManagement {
     repositories {
-        google {
-            content {
-                includeGroupByRegex("com\\.android.*")
-                includeGroupByRegex("com\\.google.*")
-                includeGroupByRegex("androidx.*")
-            }
-        }
-        mavenCentral()
+        google()
+        mavenCentral()           // donde está LibGDX :contentReference[oaicite:0]{index=0}
         gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
-        google()
-        mavenCentral()
+        google()                 // AndroidX, Play services :contentReference[oaicite:1]{index=1}
+        mavenCentral()           // LibGDX y otros artefactos :contentReference[oaicite:2]{index=2}
     }
 }
 
-rootProject.name = "Cercle Cultural Android"
-include(":app")
-include(":core", ":android")
-
-
- 
+rootProject.name = "CercleCultural"
+include(":app", ":core")
