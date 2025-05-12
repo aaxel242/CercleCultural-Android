@@ -45,6 +45,7 @@ dependencies {
     implementation (libs.retrofit)
     //noinspection UseTomlInstead
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("androidx.fragment:fragment-ktx:1.5.7")
     implementation (libs.lottie)
     implementation (libs.androidx.core.ktx)
@@ -57,7 +58,6 @@ dependencies {
     implementation ("com.badlogicgames.gdx:gdx:1.11.0")
     implementation ("com.badlogicgames.gdx:gdx-backend-android:1.11.0")
     implementation ("com.badlogicgames.gdx:gdx-box2d:1.11.0")
-
 
 
     testImplementation(libs.junit)

@@ -4,52 +4,118 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.cercleculturalandroid.R
+import com.example.cercleculturalandroid.api.ApiService
+import com.example.cercleculturalandroid.api.RetrofitClient
+import com.example.cercleculturalandroid.models.adapters.ReservasAdapter
+import com.example.cercleculturalandroid.models.clases.Reserva
+import com.example.cercleculturalandroid.models.clases.Usuari
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
-
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-/**
- * A simple [Fragment] subclass.
- * Use the [fragmentUsuario.newInstance] factory method to
- * create an instance of this fragment.
- */
 class fragmentUsuario : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var editUsuari: android.widget.EditText
+    private lateinit var editCorreu: android.widget.EditText
+    private lateinit var recyclerView: RecyclerView
+    private val userId by lazy { arguments?.getInt("userId") ?: -1 }
+    private lateinit var reservasAdapter: ReservasAdapter
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
                              ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_usuario, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        initViews(view)
+        setupRecyclerView()
+        loadUserData()
+        loadReservasData()
+    }
+
+    private fun initViews(view: View) {
+        editUsuari = view.findViewById(R.id.EditTextUsuari)
+        editCorreu = view.findViewById(R.id.EditTextCorreu)
+        recyclerView = view.findViewById(R.id.recyclerReservas)
+    }
+
+    private fun setupRecyclerView() {
+        reservasAdapter = ReservasAdapter(emptyList())
+        recyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = reservasAdapter
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun loadReservasData() {
+        RetrofitClient.getClient()
+            .create(ApiService::class.java)
+            .getReservasPerfil(userId)
+            .enqueue(object : Callback<List<Reserva>> {
+                override fun onResponse(call: Call<List<Reserva>>, response: Response<List<Reserva>>) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { reservas ->
+                            reservasAdapter.updateData(reservas)
+                        } ?: showError("No se encontraron reservas")
+                    } else {
+                        showError("Error al obtener reservas: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<List<Reserva>>, t: Throwable) {
+                    showError("Error de conexión: ${t.message}")
+                }
+            })
+    }
+
+    private fun loadUserData() {
+        if (userId == -1) {
+            showError("ID de usuario no válido")
+            return
+        }
+
+        RetrofitClient.getClient()
+            .create(ApiService::class.java)
+            .getUsuari(userId)
+            .enqueue(object : Callback<Usuari> {
+                override fun onResponse(call: Call<Usuari>, response: Response<Usuari>) {
+                    if (response.isSuccessful) {
+                        response.body()?.let { user ->
+                            updateUserInfo(user)
+                        } ?: showError("Usuario no encontrado")
+                    } else {
+                        showError("Error: ${response.code()}")
+                    }
+                }
+
+                override fun onFailure(call: Call<Usuari>, t: Throwable) {
+                    showError("Error de conexión: ${t.message}")
+                }
+            })
+    }
+
+    private fun updateUserInfo(user: Usuari) {
+        editUsuari.setText(user.nom)
+        editCorreu.setText(user.email)
+    }
+
+    private fun showError(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
+
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment fragmentUsuario.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) = fragmentUsuario().apply {
+        fun newInstance(userId: Int) = fragmentUsuario().apply {
             arguments = Bundle().apply {
-                putString(ARG_PARAM1, param1)
-                putString(ARG_PARAM2, param2)
+                putInt("userId", userId)
             }
         }
     }

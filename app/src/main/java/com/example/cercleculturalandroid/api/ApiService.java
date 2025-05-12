@@ -3,6 +3,7 @@ package com.example.cercleculturalandroid.api;
 import com.example.cercleculturalandroid.models.clases.Espai;
 import com.example.cercleculturalandroid.models.clases.Eventos;
 import com.example.cercleculturalandroid.models.clases.Mensajes;
+import com.example.cercleculturalandroid.models.clases.Reserva;
 import com.example.cercleculturalandroid.models.clases.Usuari;
 
 import java.util.List;
@@ -24,10 +25,15 @@ public interface ApiService {
 
     @GET("api/Usuaris")
     Call<List<Usuari>> getUsuaris();
+    @GET("api/Usuaris/{id}")
+    Call<Usuari> getUsuari(@Path("id") int id);
 
     @GET("api/Mensajes")
     Call<List<Mensajes>> getMensaje();
 
     @POST("api/Mensajes")
     Call<Mensajes> postMensaje(@Body Mensajes mensaje);
+
+    @GET("api/Reservas/ReservasPerfil/{userId}")
+    Call<List<Reserva>> getReservasPerfil(@Path("userId") int userId);
 }
