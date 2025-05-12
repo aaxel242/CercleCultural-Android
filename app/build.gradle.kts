@@ -42,25 +42,22 @@ android {
 
 dependencies {
 
-    implementation (libs.retrofit)
-    //noinspection UseTomlInstead
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    implementation ("androidx.fragment:fragment-ktx:1.5.7")
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("androidx.fragment:fragment-ktx:1.6.2")
     implementation (libs.lottie)
-    implementation (libs.androidx.core.ktx)
-    implementation (libs.androidx.appcompat)
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
     implementation (libs.material)
     implementation (libs.androidx.activity)
     implementation (libs.androidx.constraintlayout)
 
-
-    implementation ("com.badlogicgames.gdx:gdx:1.11.0")
-    implementation ("com.badlogicgames.gdx:gdx-backend-android:1.11.0")
-    implementation ("com.badlogicgames.gdx:gdx-box2d:1.11.0")
-
+    implementation(project(":core"))
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation("com.badlogicgames.gdx:gdx-backend-android:1.11.0") // backend Android :contentReference[oaicite:7]{index=7}
+
 }

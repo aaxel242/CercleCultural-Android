@@ -1,59 +1,37 @@
-package com.example.cercleculturalandroid.models.fragments
+package com.example.cercleculturalandroid
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.TextView
-import com.badlogic.gdx.Gdx
-import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
-import com.badlogic.gdx.backends.android.AndroidFragmentApplication
-import com.example.cercleculturalandroid.R
-import com.example.cercleculturalandroid.models.clases.EventItem
-import com.example.cercleculturalandroid.models.clases.core.MyGdxGame
+import androidx.fragment.app.Fragment
+import com.example.cercleculturalandroid.databinding.FragmentReservarBinding
 
-// 1. En fragmentReservar.kt:
-class fragmentReservar : Fragment() {
-    // Declara la variable para mantener la referencia
-    private var gdxFragment: fragmentGdx? = null
+class fragmentReservar : Fragment(R.layout.fragment_reservar) {
+
+    // Binding seguro con nullable backing property
+    private var _binding: FragmentReservarBinding? = null
+    private val binding get() = _binding!!
+
+    private lateinit var gameFragment: fragmentGdx
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Vincula el layout
+        _binding = FragmentReservarBinding.bind(view)
 
-        // Crea y guarda la instancia
-        gdxFragment = fragmentGdx()
-        childFragmentManager.beginTransaction().replace(R.id.gdx_container, gdxFragment!!).commit()
-    }
+        // Inserta el FragmentGdx en el contenedor
+        gameFragment = fragmentGdx()
+        childFragmentManager.beginTransaction()
+            .replace(binding.gdxContainer.id, gameFragment)
+            .commitNow()  // asegura que la vista esté creada antes de interactuar
 
-
-    // 2. En fragmentGdx.kt (corrección de hideStatusBar):
-    class fragmentGdx : AndroidFragmentApplication() {
-        override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
-                                 ): View {
-            val config = AndroidApplicationConfiguration().apply {
-                useImmersiveMode = false // <- Corregido aquí
-                useAccelerometer = false
-                useCompass = false
-            }
-
-            return initializeForView(MyGdxGame(), config).apply {
-                layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
-                                                     )
-            }
+        // Botón para reservar una butaca de ejemplo
+        binding.btnConfirm.setOnClickListener {
+            gameFragment.reserveSeat(col = 2, row = 1)
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        Gdx.app.postRunnable {
-            if (Gdx.graphics != null) {
-                Gdx.app.log("LIFECYCLE", "OpenGL Context Active: ${Gdx.gl != null}")
-            }
-        }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null  // evita fugas del view
     }
 }
