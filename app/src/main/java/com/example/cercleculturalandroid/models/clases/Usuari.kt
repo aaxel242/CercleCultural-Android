@@ -7,5 +7,6 @@ data class Usuari (
     val contrasenya: String,
     val tipusUsuari: String,
     val idioma: String,
+    val profileImage: String?
                   )
 

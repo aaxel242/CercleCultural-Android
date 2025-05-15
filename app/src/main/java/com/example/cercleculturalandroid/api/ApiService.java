@@ -7,10 +7,13 @@ import com.example.cercleculturalandroid.models.clases.Reserva;
 import com.example.cercleculturalandroid.models.clases.Usuari;
 
 import java.util.List;
+import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.Path;
 
 public interface ApiService {
@@ -25,6 +28,7 @@ public interface ApiService {
 
     @GET("api/Usuaris")
     Call<List<Usuari>> getUsuaris();
+
     @GET("api/Usuaris/{id}")
     Call<Usuari> getUsuari(@Path("id") int id);
 
@@ -36,4 +40,11 @@ public interface ApiService {
 
     @GET("api/Reservas/ReservasPerfil/{userId}")
     Call<List<Reserva>> getReservasPerfil(@Path("userId") int userId);
+
+    @Multipart
+    @POST("api/Usuaris/UploadImage/{userId}")
+    Call<Usuari> uploadProfileImage(
+            @Path("userId") int userId,
+            @Part MultipartBody.Part file
+    );
 }
