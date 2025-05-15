@@ -3,12 +3,9 @@ package com.butacas.core;
 public class Seat {
     public enum State { AVAILABLE, SELECTED }
 
-    private final int id;
-    private final int col;
-    private final int row;
+    private final int id, col, row;
     private State state;
-    private final float x;
-    private final float y;
+    private final float x, y;
 
     public Seat(int id, int col, int row, State state, float x, float y) {
         this.id = id;

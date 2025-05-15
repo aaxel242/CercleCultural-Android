@@ -1,3 +1,5 @@
+// Remove redundant pluginManagement/dependencyResolutionManagement
+// Keep only:
 plugins {
     id("java-library")
     alias(libs.plugins.jetbrains.kotlin.jvm)
@@ -14,9 +16,7 @@ kotlin {
     }
 }
 
+val gdxVersion = "1.12.0"
 dependencies {
-    // API multiplataforma de LibGDX
-    implementation("com.badlogicgames.gdx:gdx:1.11.0")                // :contentReference[oaicite:3]{index=3}
-    // (Opcional) Si usas Box2D en core:
-    // implementation("com.badlogicgames.gdx:gdx-box2d:1.11.0")       :contentReference[oaicite:4]{index=4}
+    api("com.badlogicgames.gdx:gdx:$gdxVersion")
 }

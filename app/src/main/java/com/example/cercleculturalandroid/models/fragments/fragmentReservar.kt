@@ -5,33 +5,25 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import com.example.cercleculturalandroid.databinding.FragmentReservarBinding
 
-class fragmentReservar : Fragment(R.layout.fragment_reservar) {
-
-    // Binding seguro con nullable backing property
-    private var _binding: FragmentReservarBinding? = null
-    private val binding get() = _binding!!
-
-    private lateinit var gameFragment: fragmentGdx
+ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
+        private var _binding: FragmentReservarBinding? = null
+        private val binding get() = _binding!!
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        // Vincula el layoutafga
         _binding = FragmentReservarBinding.bind(view)
 
-        // Inserta el FragmentGdx en el contenedor
-        gameFragment = fragmentGdx()
+        //LIBGDX
+        /*val gdxFrag = fragmentGdx()
         childFragmentManager.beginTransaction()
-            .replace(binding.gdxContainer.id, gameFragment)
-            .commitNow()  // asegura que la vista esté creada antes de interactuar
-
-        // Botón para reservar una butaca de ejemplo
-        binding.btnConfirm.setOnClickListener {
-            gameFragment.reserveSeat(col = 2, row = 1)
-        }
+            .replace(binding.gdxContainer.id, gdxFrag)
+            .commit()/
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null  // evita fugas del view
+        _binding = null*/
+
+        //
     }
 }

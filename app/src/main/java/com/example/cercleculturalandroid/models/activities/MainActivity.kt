@@ -1,79 +1,91 @@
+// app/src/main/java/com/example/cercleculturalandroid/MainActivity.kt
 package com.example.cercleculturalandroid.models.activities
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
+import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.example.cercleculturalandroid.R
+import com.example.cercleculturalandroid.databinding.ActivityMainBinding
 import com.example.cercleculturalandroid.models.fragments.fragmentChat
 import com.example.cercleculturalandroid.models.fragments.fragmentInici
 import com.example.cercleculturalandroid.models.fragments.fragmentIniciAdmin
 import com.example.cercleculturalandroid.models.fragments.fragmentUsuario
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), AndroidFragmentApplication.Callbacks {
 
-    private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var binding: ActivityMainBinding
     private var isAdmin = false
     private var userId: Int = -1
     private var userName: String = "Usuari"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        // Inflar layout con ViewBinding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        // Recupera extra de la condicion de admin
+        // Leer datos pasados en el Intent
         isAdmin = intent.getBooleanExtra("isAdmin", false)
-        userId = intent.getIntExtra("userId", -1)
-        userName = intent.getStringExtra("userName").toString()
+        userId  = intent.getIntExtra("userId", -1)
+        userName = intent.getStringExtra("userName") ?: "Usuari"
 
-        // Configurar BottomNavigationView
-        bottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottomNavigationView.itemIconTintList = null
-        bottomNavigationView.setOnNavigationItemSelectedListener { item ->
+        // Configurar la barra inferior
+        val bottomNav: BottomNavigationView = binding.bottomNavigation
+        bottomNav.itemIconTintList = null
+        bottomNav.setOnItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.inici -> {
-                    // si es admin o no carga el fragmento correspondiente
-                    if (isAdmin) {
-                        reemplazarFragmento(fragmentIniciAdmin(), false)
+                    val frag: Fragment = if (isAdmin) {
+                        fragmentIniciAdmin()
                     } else {
-                        reemplazarFragmento(fragmentInici(), false)
+                        fragmentInici()
                     }
+                    replaceFragment(frag)
                     true
                 }
                 R.id.chat -> {
-                    val chatFragment = fragmentChat().apply {
+                    val chatFrag = fragmentChat().apply {
                         arguments = Bundle().apply {
                             putInt("userId", userId)
-                            putString("userName", userName) // Enviamos el ID al fragmento
+                            putString("userName", userName)
                         }
                     }
-                    reemplazarFragmento(chatFragment, false)
+                    replaceFragment(chatFrag)
                     true
                 }
                 R.id.usuari -> {
-                    val userFragment = fragmentUsuario().apply {
+                    val userFrag = fragmentUsuario().apply {
                         arguments = Bundle().apply {
                             putInt("userId", userId)
                         }
                     }
-                    reemplazarFragmento(userFragment, false)
+                    replaceFragment(userFrag)
                     true
                 }
                 else -> false
             }
         }
 
-        // 4) Selección inicial
+        // Selección inicial
         if (savedInstanceState == null) {
-            // Esto disparará el listener de arriba con el ID correcto
-            bottomNavigationView.selectedItemId = R.id.inici
+            bottomNav.selectedItemId = R.id.inici
         }
     }
 
-    private fun reemplazarFragmento(fragment: Fragment, addToBackStack: Boolean) {
-        val tx = supportFragmentManager.beginTransaction()
-            .replace(R.id.flFragment, fragment)
-        if (addToBackStack) tx.addToBackStack(null)
-        tx.commit()
+    /** Inserta o reemplaza el fragmento en el container R.id.flFragment */
+    private fun replaceFragment(fragment: Fragment, addToBackStack: Boolean = false) {
+        supportFragmentManager.beginTransaction().apply {
+            replace(R.id.flFragment, fragment)
+            if (addToBackStack) addToBackStack(null)
+            commit()
+        }
+    }
+
+    /** Método requerido por AndroidFragmentApplication.Callbacks */
+    override fun exit() {
+        // No es necesario implementar lógica de salida en este embed
     }
 }

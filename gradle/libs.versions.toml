@@ -1,5 +1,8 @@
 [versions]
 agp = "8.8.0"
+appcompatVersion = "1.6.1"
+coreKtxVersion = "1.12.0"
+fragmentKtx = "1.6.2"
 gdx = "1.11.0"
 badlogicgamesGdxBox2dPlatform = "1.11.0"
 fragmentKtxVersion = "1.5.5"
@@ -18,10 +21,14 @@ retrofit = "2.9.0"
 jetbrainsKotlinJvm = "1.9.24"
 
 [libraries]
+androidx-appcompat-v161 = { module = "androidx.appcompat:appcompat", version.ref = "appcompatVersion" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-core-ktx-v1120 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
+androidx-fragment-ktx-v162 = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 badlogic-gdx = { module = "com.badlogic.gdx:gdx", version.ref = "gdxBackendAndroid" }
 badlogic-gdx-backend-android = { module = "com.badlogic.gdx:gdx-backend-android", version.ref = "gdxBackendAndroid" }
 com-badlogicgames-gdx-gdx-box2d-platform = { module = "com.badlogicgames.gdx:gdx-box2d-platform", version.ref = "badlogicgamesGdxBox2dPlatform" }
+converter-gson = { module = "com.squareup.retrofit2:converter-gson", version.ref = "retrofit" }
 fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtxVersion" }
 gdx = { module = "com.badlogicgames.gdx:gdx", version.ref = "badlogicgamesGdxBox2dPlatform" }
 gdx-backend-android = { module = "com.badlogicgames.gdx:gdx-backend-android", version.ref = "badlogicgamesGdxBox2dPlatform" }

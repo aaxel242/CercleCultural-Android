@@ -9,23 +9,20 @@ import com.badlogic.gdx.backends.android.AndroidFragmentApplication
 import com.butacas.core.MyGdxGame
 
 class fragmentGdx : AndroidFragmentApplication() {
-    private lateinit var game: MyGdxGame
+    private val game = MyGdxGame()
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
                              ): View {
-        // Instancia y configura el juego
-        game = MyGdxGame()
         val config = AndroidApplicationConfiguration().apply {
             useAccelerometer = false
-            useCompass       = false
+            useCompass = false
+            useGL30 = true // Try newer OpenGL version
+            numSamples = 2 // Anti-aliasing
         }
-        // Devuelve la vista GL embebida
         return initializeForView(game, config)
     }
-
-    /** Expuesto a la UI Android para reservar butacas */
-    fun reserveSeat(col: Int, row: Int) {
-        game.selectSeat(col, row)
-    }
 }
+

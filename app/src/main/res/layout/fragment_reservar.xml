@@ -6,25 +6,181 @@
     android:orientation="vertical"
     android:background="@color/fondo">
 
-    <!-- Título y controles -->
+   <ImageView
+       android:layout_width="wrap_content"
+       android:layout_height="wrap_content"
+       android:src="@drawable/imgvolver"
+       android:layout_marginTop="20dp"
+       android:layout_marginLeft="20dp">
+   </ImageView>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/img_cc_logo_blanco_y_negro"
+        android:layout_gravity="center">
+    </ImageView>
+
     <TextView
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Selecciona tu butaca"
-        android:padding="16dp"/>
+        android:text="Reserva"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppinsregular"
+        android:textColor="@color/black"
+        android:textSize="30sp">
 
-    <!-- Contenedor LibGDX (Ocupa el 70% de la pantalla) -->
-    <FrameLayout
-        android:id="@+id/gdx_container"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="3"/>
+    </TextView>
 
-    <!-- Botones de acción -->
+    <LinearLayout
+        android:layout_width="350dp"
+        android:layout_height="539dp"
+        android:layout_gravity="center"
+        android:background="@color/azul"
+        android:orientation="vertical">
 
-    <Button
-        android:id="@+id/btnConfirm"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Confirmar"/>
+        <TextView
+            android:id="@+id/evName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:fontFamily="@font/poppinssemibold"
+            android:gravity="center_vertical"
+            android:text="Concert"
+            android:textColor="@color/black"
+            android:textSize="20dp"></TextView>
+
+        <TextView
+            android:id="@+id/evDesc"
+            android:layout_width="321dp"
+            android:layout_height="115dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:fontFamily="@font/worksansvariablefontwght"
+            android:gravity="center"
+            android:text="Data">
+
+        </TextView>
+
+        <LinearLayout
+            android:layout_width="320dp"
+            android:layout_height="70dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:background="@color/fondo"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/evUbicacion"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/worksansvariablefontwght"
+                android:text="Horario:"></TextView>
+
+            <TextView
+                android:id="@+id/evHorario"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/worksansvariablefontwght"
+                android:text="Ubicación:"></TextView>
+
+            <TextView
+                android:id="@+id/evAforo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:fontFamily="@font/worksansvariablefontwght"
+                android:text="Aforo:"></TextView>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="40dp"
+            android:fontFamily="@font/poppinsregular"
+            android:text="Places Disponibles"
+            android:textColor="@color/black"
+            android:textSize="20sp"></TextView>
+
+        <TextView
+            android:id="@+id/evPlacesDisponibles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="@font/poppinsregular"
+            android:text="2/50"
+            android:textColor="@color/black"
+            android:textSize="20dp"></TextView>
+
+        <LinearLayout
+            android:layout_width="275dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/Img_menos"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginLeft="90dp"
+                android:background="@color/fondo"
+                android:padding="10dp"
+                android:src="@drawable/imgmenos" />
+
+            <TextView
+                android:id="@+id/TxtViewCantidad"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center"
+                android:background="@color/amarillo"
+                android:text="1"
+                android:textAlignment="center"
+                android:textColor="@color/black"
+                android:textSize="21sp" />
+
+            <ImageView
+                android:id="@+id/Img_mas"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:background="@color/fondo"
+                android:padding="10dp"
+                android:src="@drawable/imgmas" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnReservar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/amarillo"
+            android:text="Reservar"
+            android:textColor="@color/black">
+
+        </Button>
+
+
+        <!--
+        <FrameLayout
+            android:id="@+id/gdx_container"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="3"/>
+
+
+
+
+        <Button
+            android:id="@+id/btnConfirm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Confirmar"/>-->
+    </LinearLayout>
 </LinearLayout>
