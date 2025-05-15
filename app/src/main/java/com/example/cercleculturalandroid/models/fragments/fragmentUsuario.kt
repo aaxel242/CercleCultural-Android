@@ -12,6 +12,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -38,10 +40,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class fragmentUsuario : Fragment() {
-    private lateinit var editUsuari: android.widget.EditText
-    private lateinit var editCorreu: android.widget.EditText
+    private lateinit var editUsuari: EditText
+    private lateinit var editCorreu: EditText
     private lateinit var recyclerView: RecyclerView
-    private lateinit var imgProfile: android.widget.ImageView
+    private lateinit var imgProfile: ImageView
     private val userId by lazy { arguments?.getInt("userId") ?: -1 }
     private lateinit var reservasAdapter: ReservasAdapter
     private var currentPhotoPath: String? = null

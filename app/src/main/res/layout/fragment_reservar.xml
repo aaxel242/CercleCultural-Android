@@ -7,6 +7,7 @@
     android:background="@color/fondo">
 
    <ImageView
+       android:id="@+id/imgVolver"
        android:layout_width="wrap_content"
        android:layout_height="wrap_content"
        android:src="@drawable/imgvolver"
@@ -66,7 +67,7 @@
 
         <LinearLayout
             android:layout_width="320dp"
-            android:layout_height="70dp"
+            android:layout_height="52dp"
             android:layout_gravity="center"
             android:layout_marginTop="10dp"
             android:background="@color/fondo"
@@ -88,13 +89,6 @@
                 android:fontFamily="@font/worksansvariablefontwght"
                 android:text="Ubicación:"></TextView>
 
-            <TextView
-                android:id="@+id/evAforo"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:fontFamily="@font/worksansvariablefontwght"
-                android:text="Aforo:"></TextView>
         </LinearLayout>
 
         <TextView
@@ -113,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:fontFamily="@font/poppinsregular"
-            android:text="2/50"
+            android:text="50"
             android:textColor="@color/black"
             android:textSize="20dp"></TextView>
 
@@ -125,7 +119,7 @@
             android:orientation="horizontal">
 
             <ImageView
-                android:id="@+id/Img_menos"
+                android:id="@+id/imgMenos"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:layout_marginLeft="90dp"
@@ -134,7 +128,7 @@
                 android:src="@drawable/imgmenos" />
 
             <TextView
-                android:id="@+id/TxtViewCantidad"
+                android:id="@+id/txtViewCantidad"
                 android:layout_width="40dp"
                 android:layout_height="30dp"
                 android:layout_gravity="center"
@@ -145,7 +139,7 @@
                 android:textSize="21sp" />
 
             <ImageView
-                android:id="@+id/Img_mas"
+                android:id="@+id/imgMas"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:background="@color/fondo"
@@ -170,7 +164,7 @@
         <!--
         <FrameLayout
             android:id="@+id/gdx_container"
-            android:layout_width="match_parent"sds
+            android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="3"/>
 

@@ -47,4 +47,8 @@ public interface ApiService {
             @Path("userId") int userId,
             @Part MultipartBody.Part file
     );
+
+    @POST("api/Reservas")
+    Call<Reserva> postReserva(@Body Reserva reserva);
+
 }

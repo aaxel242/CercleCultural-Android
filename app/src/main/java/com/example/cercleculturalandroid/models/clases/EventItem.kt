@@ -9,7 +9,10 @@ data class EventItem(
     val nom: String,
     val descripcio: String,
     val dataInici: String,
+    val dataFi: String,
+    val aforament: Int,
     val espai_id: Int,
     val ubicacio: String,
+    val imatge: String?,
     val perInfants: Boolean
                     ) : Parcelable
