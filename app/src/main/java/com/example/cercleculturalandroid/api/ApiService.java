@@ -1,12 +1,15 @@
+// app/src/main/java/com/example/cercleculturalandroid/api/ApiService.java
 package com.example.cercleculturalandroid.api;
 
 import com.example.cercleculturalandroid.models.clases.Espai;
 import com.example.cercleculturalandroid.models.clases.Eventos;
 import com.example.cercleculturalandroid.models.clases.Mensajes;
 import com.example.cercleculturalandroid.models.clases.Reserva;
+import com.example.cercleculturalandroid.models.clases.ReservaRequest;
 import com.example.cercleculturalandroid.models.clases.Usuari;
 
 import java.util.List;
+
 import okhttp3.MultipartBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -47,8 +50,6 @@ public interface ApiService {
             @Path("userId") int userId,
             @Part MultipartBody.Part file
     );
-
     @POST("api/Reservas")
-    Call<Reserva> postReserva(@Body Reserva reserva);
-
+    Call<Reserva> postReserva(@Body ReservaRequest req);
 }

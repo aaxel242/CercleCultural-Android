@@ -19,17 +19,35 @@ import com.example.cercleculturalandroid.models.clases.SocketManager
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
-import java.util.Date
+import java.util.*
 
 class fragmentChat : Fragment(), SocketManager.MessageListener {
 
     private var _binding: FragmentChatBinding? = null
     private val binding get() = _binding!!
     private lateinit var chatAdapter: ChatAdapter
-    private val userId by lazy { arguments?.getInt("userId") ?: -1 }
-    private val userName by lazy { arguments?.getString("userName") ?: "Usuari" }
-    private val apiService: ApiService = RetrofitClient.getClient().create(ApiService::class.java)
 
+    // Ya no usamos `by lazy` sino argumentos recuperados en onViewCreated
+    private var userId: Int = -1
+    private var userName: String = "Usuari"
+
+    private val apiService: ApiService =
+        RetrofitClient.getClient().create(ApiService::class.java)
+
+    companion object {
+        private const val ARG_USER_ID = "arg_user_id"
+        private const val ARG_USER_NAME = "arg_user_name"
+
+        /** Usa este método al instanciar el fragment desde la Activity: */
+        fun newInstance(userId: Int, userName: String) = fragmentChat().apply {
+            arguments = Bundle().apply {
+                putInt(ARG_USER_ID, userId)
+                putString(ARG_USER_NAME, userName)
+            }
+        }
+    }
+
+    // ViewModel idéntico
     class ChatViewModel(
         private val listener: SocketManager.MessageListener,
         private val apiService: ApiService
@@ -38,14 +56,16 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
 
         fun loadInitialMessages(callback: (List<Mensajes>) -> Unit) {
             apiService.getMensajes().enqueue(object : Callback<List<Mensajes>> {
-                override fun onResponse(call: Call<List<Mensajes>>, response: Response<List<Mensajes>>) {
+                override fun onResponse(
+                    call: Call<List<Mensajes>>,
+                    response: Response<List<Mensajes>>
+                                       ) {
                     if (response.isSuccessful) {
                         callback(response.body() ?: emptyList())
                     } else {
                         listener.onError("Error cargando mensajes: ${response.code()}")
                     }
                 }
-
                 override fun onFailure(call: Call<List<Mensajes>>, t: Throwable) {
                     listener.onError("Error de conexión: ${t.message}")
                 }
@@ -59,7 +79,6 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
                         listener.onError("Error al guardar mensaje: ${response.code()}")
                     }
                 }
-
                 override fun onFailure(call: Call<Mensajes>, t: Throwable) {
                     listener.onError("Error de red: ${t.message}")
                 }
@@ -80,12 +99,12 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
         }
     }
 
-    private val viewModel: ChatViewModel by viewModels { ChatViewModelFactory(this, apiService) }
+    private val viewModel: ChatViewModel by viewModels {
+        ChatViewModelFactory(this, apiService)
+    }
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
                              ): View {
         _binding = FragmentChatBinding.inflate(inflater, container, false)
         return binding.root
@@ -93,40 +112,35 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        // Recuperamos userId y userName de los arguments
+        arguments?.let {
+            userId = it.getInt(ARG_USER_ID, -1)
+            userName = it.getString(ARG_USER_NAME, "Usuari") ?: "Usuari"
+        }
         setupChat()
         loadInitialMessages()
     }
 
     private fun setupChat() {
-        setupRecyclerView()
-        setupSendButton()
-    }
-
-    private fun setupRecyclerView() {
         chatAdapter = ChatAdapter(mutableListOf(), userId)
         binding.rvMensajesChat.apply {
-            layoutManager = LinearLayoutManager(requireContext()).apply {
-                stackFromEnd = true
-            }
+            layoutManager = LinearLayoutManager(requireContext()).apply { stackFromEnd = true }
             adapter = chatAdapter
         }
-    }
-
-    private fun setupSendButton() {
         binding.btnSend.setOnClickListener {
-            val messageText = binding.etMessage.text.toString().trim()
-            if (messageText.isNotEmpty()) {
-                sendMessageToServer(messageText)
+            val text = binding.etMessage.text.toString().trim()
+            if (text.isNotEmpty()) {
+                sendMessageToServer(text)
                 binding.etMessage.text?.clear()
             }
         }
     }
 
     private fun loadInitialMessages() {
-        viewModel.loadInitialMessages { messages ->
+        viewModel.loadInitialMessages { msgs ->
             activity?.runOnUiThread {
-                chatAdapter.updateMessages(messages.toMutableList())
-                scrollToBottom()
+                chatAdapter.updateMessages(msgs.toMutableList())
+                binding.rvMensajesChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
             }
         }
     }
@@ -139,51 +153,32 @@ class fragmentChat : Fragment(), SocketManager.MessageListener {
             missatge = text,
             dataEnviament = Date()
                                  )
-
-        // Envía a través de Socket y guarda en la API
         viewModel.socketManager.sendMessage(newMessage)
         viewModel.sendMessageToApi(newMessage)
     }
 
+    /** Métodos de SocketManager.MessageListener */
     override fun onMessageReceived(mensaje: Mensajes) {
         activity?.runOnUiThread {
             chatAdapter.addMessage(mensaje)
-            scrollToBottom()
+            binding.rvMensajesChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
         }
     }
-
     override fun onConnectionStatusChanged(connected: Boolean) {
         activity?.runOnUiThread {
             val status = if (connected) "Conectado" else "Desconectado"
             Toast.makeText(requireContext(), status, Toast.LENGTH_SHORT).show()
         }
     }
-
     override fun onError(error: String) {
         activity?.runOnUiThread {
             Toast.makeText(requireContext(), error, Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun scrollToBottom() {
-        binding.rvMensajesChat.smoothScrollToPosition(chatAdapter.itemCount - 1)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
-        disconnectFromServer()
-        _binding = null
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (isRemoving) {
-            disconnectFromServer()
-        }
-    }
-
-    private fun disconnectFromServer() {
         viewModel.socketManager.disconnect()
-        Toast.makeText(requireContext(), "Desconectado del chat", Toast.LENGTH_SHORT).show()
+        _binding = null
     }
 }

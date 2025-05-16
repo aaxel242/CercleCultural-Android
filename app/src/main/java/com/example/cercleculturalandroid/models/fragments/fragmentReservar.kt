@@ -7,114 +7,145 @@ import androidx.fragment.app.Fragment
 import com.example.cercleculturalandroid.api.ApiService
 import com.example.cercleculturalandroid.api.RetrofitClient
 import com.example.cercleculturalandroid.databinding.FragmentReservarBinding
-import com.example.cercleculturalandroid.models.clases.Reserva
 import com.example.cercleculturalandroid.models.clases.EventItem
+import com.example.cercleculturalandroid.models.clases.Reserva
+import com.example.cercleculturalandroid.models.clases.ReservaRequest
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import java.util.*
 
 class fragmentReservar : Fragment(R.layout.fragment_reservar) {
-    private var _b: FragmentReservarBinding? = null
-    private val b get() = _b!!
+    private var _binding: FragmentReservarBinding? = null
+    private val b get() = _binding!!
 
     private lateinit var event: EventItem
-    private var available = 0
-    private var qty = 1
-    private var userId = -1
+    private var userId: Int = -1
+
+    // 1) Aforo original e imitable
+    private var totalCapacity: Int = 0
+    private var availableSeats: Int = 0
+
+    // 2) Cantidad a reservar
+    private var qty: Int = 1
 
     companion object {
         private const val ARG_EVENT = "arg_event"
-        fun newInstance(ev: EventItem) = fragmentReservar().apply {
-            arguments = Bundle().apply { putParcelable(ARG_EVENT, ev) }
+        private const val ARG_USER  = "arg_user"
+
+        fun newInstance(ev: EventItem, userId: Int) = fragmentReservar().apply {
+            arguments = Bundle().apply {
+                putParcelable(ARG_EVENT, ev)
+                putInt(ARG_USER, userId)
+            }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        _b = FragmentReservarBinding.bind(view)
+        _binding = FragmentReservarBinding.bind(view)
 
-        event = requireArguments().getParcelable(ARG_EVENT)!!
-        available = event.aforament
+        // Recuperar argumentos
+        event  = requireArguments().getParcelable(ARG_EVENT)!!
+        userId = requireArguments().getInt(ARG_USER, -1)
 
+        // Inicializar aforos
+        totalCapacity   = event.aforament
+        availableSeats  = totalCapacity
+
+        setupUi()
+    }
+
+    private fun setupUi() {
         // Botón volver
         b.imgVolver.setOnClickListener { parentFragmentManager.popBackStack() }
 
-        // Datos
-        b.evName.text = event.nom
-        b.evDesc.text = event.descripcio
-        b.evUbicacion.text = "Ubicación: ${event.ubicacio}"
-        b.evHorario.text = "Horario: ${event.dataInici}"
-        b.evPlacesDisponibles.text = "$available"
+        // Mostrar datos del evento
+        b.evName.text               = event.nom
+        b.evDesc.text               = event.descripcio
+        b.evUbicacion.text          = "Ubicación: ${event.ubicacio}"
+        b.evHorario.text            = "Horario: ${event.dataInici}"
+        b.evPlacesDisponibles.text  = availableSeats.toString()
+        b.txtViewCantidad.text      = qty.toString()
 
-        // Cantidad
+        // Ajustar cantidad
         b.imgMenos.setOnClickListener {
             if (qty > 1) {
                 qty--
-                b.txtViewCantidad.text = "$qty"
+                b.txtViewCantidad.text = qty.toString()
             }
         }
         b.imgMas.setOnClickListener {
-            if (qty < available) {
+            if (qty < availableSeats) {
                 qty++
-                b.txtViewCantidad.text = "$qty"
+                b.txtViewCantidad.text = qty.toString()
             }
         }
 
-        // Reservar
+        // Acción reservar
         b.btnReservar.setOnClickListener { doLocalReserve() }
     }
 
     private fun doLocalReserve() {
-        if (qty > available) {
+        // Validaciones
+        if (userId < 0) {
+            Toast.makeText(requireContext(), "Usuario no válido", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (qty > availableSeats) {
             Toast.makeText(requireContext(), "No quedan tantas plazas", Toast.LENGTH_SHORT).show()
             return
         }
-        available -= qty
-        b.evPlacesDisponibles.text = "$available"
 
-        val newRes = Reserva(
-            id             = 0,
-            usuariId       = userId,
-            esdevenimentId = event.id,
-            espaiId        = event.espai_id,
-            dataReserva    = nowIso(),
-            estat          = "CONFIRMADA",
-            tipus          = "NORMAL",
-            dataInici      = event.dataInici,
-            dataFi         = event.dataFi,
-            numPlaces      = qty
-                            )
+        // Reducir solo en UI
+        availableSeats -= qty
+        b.evPlacesDisponibles.text = availableSeats.toString()
 
+        // Construir objeto Reserva
+        val req = ReservaRequest(
+            usuari_id       = userId,
+            esdeveniment_id = event.id,
+            espai_id        = event.espai_id,
+            dataReserva     = nowIso(),
+            estat           = "CONFIRMADA",
+            tipus           = "NORMAL",
+            dataInici       = event.dataInici,
+            dataFi          = event.dataFi ?: event.dataInici,
+            numPlaces       = qty
+                                )
+
+        // Envío a la API
         RetrofitClient.getClient()
             .create(ApiService::class.java)
-            .postReserva(newRes)
+            .postReserva(req)
             .enqueue(object : Callback<Reserva> {
                 override fun onResponse(call: Call<Reserva>, resp: Response<Reserva>) {
-                    if (!resp.isSuccessful) {
-                        // revertir
-                        available += qty
-                        b.evPlacesDisponibles.text = "$available"
-                        Toast.makeText(requireContext(), "Error ${resp.code()}", Toast.LENGTH_SHORT).show()
+                    if (resp.isSuccessful) {
+                        Toast.makeText(requireContext(), "Reserva creada con éxito", Toast.LENGTH_SHORT).show()
                     } else {
-                        Toast.makeText(requireContext(), "Reserva OK", Toast.LENGTH_SHORT).show()
+                        // Si da 500, revertimos solo en UI
+                        availableSeats += qty
+                        b.evPlacesDisponibles.text = availableSeats.toString()
+                        Toast.makeText(requireContext(), "Error del servidor: ${resp.code()}", Toast.LENGTH_LONG).show()
                     }
                 }
                 override fun onFailure(call: Call<Reserva>, t: Throwable) {
-                    available += qty
-                    b.evPlacesDisponibles.text = "$available"
-                    Toast.makeText(requireContext(), "Fallo: ${t.localizedMessage}", Toast.LENGTH_LONG).show()
+                    // En fallo de red, revertimos UI
+                    availableSeats += qty
+                    b.evPlacesDisponibles.text = availableSeats.toString()
+                    Toast.makeText(requireContext(), "Fallo de red: ${t.localizedMessage}", Toast.LENGTH_LONG).show()
                 }
             })
     }
 
     private fun nowIso(): String =
-        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).format(Date())
+        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
+            .format(Date())
+
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _b = null
+        _binding = null
     }
 }
