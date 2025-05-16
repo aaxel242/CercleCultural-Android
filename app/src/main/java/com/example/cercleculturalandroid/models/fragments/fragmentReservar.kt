@@ -122,12 +122,14 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
             .enqueue(object : Callback<Reserva> {
                 override fun onResponse(call: Call<Reserva>, resp: Response<Reserva>) {
                     if (resp.isSuccessful) {
-                        Toast.makeText(requireContext(), "Reserva creada con éxito", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "Reserva creada", Toast.LENGTH_SHORT).show()
                     } else {
-                        // Si da 500, revertimos solo en UI
                         availableSeats += qty
                         b.evPlacesDisponibles.text = availableSeats.toString()
-                        Toast.makeText(requireContext(), "Error del servidor: ${resp.code()}", Toast.LENGTH_LONG).show()
+
+                        // Leer mensaje de error del cuerpo
+                        val errorBody = resp.errorBody()?.string() ?: "Error desconocido"
+                        Toast.makeText(requireContext(), "Error ${resp.code()}: $errorBody", Toast.LENGTH_LONG).show()
                     }
                 }
                 override fun onFailure(call: Call<Reserva>, t: Throwable) {
@@ -139,10 +141,12 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
             })
     }
 
-    private fun nowIso(): String =
-        SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault())
-            .format(Date())
-
+    private fun nowIso(): String {
+        // Usa el formato exacto que espera la API (sin milisegundos ni zona horaria)
+        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+        sdf.timeZone = TimeZone.getTimeZone("UTC") // Asegúrate de usar UTC
+        return sdf.format(Date())
+    }
 
     override fun onDestroyView() {
         super.onDestroyView()
