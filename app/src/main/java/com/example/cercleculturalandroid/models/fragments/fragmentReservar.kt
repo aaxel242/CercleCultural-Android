@@ -1,6 +1,7 @@
 package com.example.cercleculturalandroid
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -13,26 +14,24 @@ import com.example.cercleculturalandroid.models.clases.ReservaRequest
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import com.google.gson.JsonParser
 import java.text.SimpleDateFormat
 import java.util.*
 
 class fragmentReservar : Fragment(R.layout.fragment_reservar) {
+
     private var _binding: FragmentReservarBinding? = null
     private val b get() = _binding!!
 
     private lateinit var event: EventItem
     private var userId: Int = -1
-
-    // 1) Aforo original e imitable
     private var totalCapacity: Int = 0
     private var availableSeats: Int = 0
-
-    // 2) Cantidad a reservar
     private var qty: Int = 1
 
     companion object {
         private const val ARG_EVENT = "arg_event"
-        private const val ARG_USER  = "arg_user"
+        private const val ARG_USER = "arg_user"
 
         fun newInstance(ev: EventItem, userId: Int) = fragmentReservar().apply {
             arguments = Bundle().apply {
@@ -46,106 +45,168 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
         super.onViewCreated(view, savedInstanceState)
         _binding = FragmentReservarBinding.bind(view)
 
-        // Recuperar argumentos
-        event  = requireArguments().getParcelable(ARG_EVENT)!!
+        event = requireArguments().getParcelable(ARG_EVENT)!!
         userId = requireArguments().getInt(ARG_USER, -1)
-
-        // Inicializar aforos
-        totalCapacity   = event.aforament
-        availableSeats  = totalCapacity
+        totalCapacity = event.aforament
+        availableSeats = totalCapacity
 
         setupUi()
     }
 
     private fun setupUi() {
-        // Botón volver
         b.imgVolver.setOnClickListener { parentFragmentManager.popBackStack() }
 
-        // Mostrar datos del evento
-        b.evName.text               = event.nom
-        b.evDesc.text               = event.descripcio
-        b.evUbicacion.text          = "Ubicación: ${event.ubicacio}"
-        b.evHorario.text            = "Horario: ${event.dataInici}"
-        b.evPlacesDisponibles.text  = availableSeats.toString()
-        b.txtViewCantidad.text      = qty.toString()
+        with(b) {
+            evName.text = event.nom
+            evDesc.text = event.descripcio
+            evUbicacion.text = "Ubicación: ${event.ubicacio}"
+            evHorario.text = "Horario: ${event.dataInici}"
+            evPlacesDisponibles.text = availableSeats.toString()
+            txtViewCantidad.text = qty.toString()
 
-        // Ajustar cantidad
-        b.imgMenos.setOnClickListener {
-            if (qty > 1) {
-                qty--
-                b.txtViewCantidad.text = qty.toString()
-            }
+            imgMenos.setOnClickListener { adjustQuantity(-1) }
+            imgMas.setOnClickListener { adjustQuantity(1) }
+            btnReservar.setOnClickListener { doLocalReserve() }
         }
-        b.imgMas.setOnClickListener {
-            if (qty < availableSeats) {
-                qty++
-                b.txtViewCantidad.text = qty.toString()
-            }
-        }
+    }
 
-        // Acción reservar
-        b.btnReservar.setOnClickListener { doLocalReserve() }
+    private fun adjustQuantity(delta: Int) {
+        qty = (qty + delta).coerceIn(1, availableSeats)
+        b.txtViewCantidad.text = qty.toString()
     }
 
     private fun doLocalReserve() {
-        // Validaciones
-        if (userId < 0) {
-            Toast.makeText(requireContext(), "Usuario no válido", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (qty > availableSeats) {
-            Toast.makeText(requireContext(), "No quedan tantas plazas", Toast.LENGTH_SHORT).show()
-            return
-        }
+        if (!validateInputs()) return
 
-        // Reducir solo en UI
         availableSeats -= qty
         b.evPlacesDisponibles.text = availableSeats.toString()
 
-        // Construir objeto Reserva
-        val req = ReservaRequest(
-            usuari_id       = userId,
-            esdeveniment_id = event.id,
-            espai_id        = event.espai_id,
-            dataReserva     = nowIso(),
-            estat           = "CONFIRMADA",
-            tipus           = "NORMAL",
-            dataInici       = event.dataInici,
-            dataFi          = event.dataFi ?: event.dataInici,
-            numPlaces       = qty
-                                )
+        val req = buildReservaRequest()
+        sendReservationRequest(req)
+    }
 
-        // Envío a la API
+    private fun validateInputs(): Boolean {
+        return when {
+            userId <= 0 -> {
+                showToast("Usuario no válido")
+                false
+            }
+            event.espai_id <= 0 -> {
+                showToast("Espacio no válido")
+                false
+            }
+            event.dataInici.isNullOrEmpty() -> {
+                showToast("Fecha de inicio inválida")
+                false
+            }
+            else -> true
+        }
+    }
+
+    private fun buildReservaRequest(): ReservaRequest {
+        return ReservaRequest(
+            usuari_id = userId,
+            esdeveniment_id = event.id,
+            espai_id = event.espai_id,
+            dataReserva = nowIso(),
+            estat = "CONFIRMADA",
+            tipus = "NORMAL",
+            dataInici = formatDateForApi(event.dataInici),
+            dataFi = formatDateForApi(event.dataFi ?: event.dataInici),
+            numPlaces = qty  // <- Nombre correcto
+        )
+    }
+
+    private fun sendReservationRequest(req: ReservaRequest) {
         RetrofitClient.getClient()
             .create(ApiService::class.java)
             .postReserva(req)
             .enqueue(object : Callback<Reserva> {
                 override fun onResponse(call: Call<Reserva>, resp: Response<Reserva>) {
-                    if (resp.isSuccessful) {
-                        Toast.makeText(requireContext(), "Reserva creada", Toast.LENGTH_SHORT).show()
+                    if (!resp.isSuccessful) {
+                        handleApiError(resp)
                     } else {
-                        availableSeats += qty
-                        b.evPlacesDisponibles.text = availableSeats.toString()
-
-                        // Leer mensaje de error del cuerpo
-                        val errorBody = resp.errorBody()?.string() ?: "Error desconocido"
-                        Toast.makeText(requireContext(), "Error ${resp.code()}: $errorBody", Toast.LENGTH_LONG).show()
+                        showToast("Reserva creada exitosamente")
                     }
                 }
+
                 override fun onFailure(call: Call<Reserva>, t: Throwable) {
-                    // En fallo de red, revertimos UI
-                    availableSeats += qty
-                    b.evPlacesDisponibles.text = availableSeats.toString()
-                    Toast.makeText(requireContext(), "Fallo de red: ${t.localizedMessage}", Toast.LENGTH_LONG).show()
+                    revertUIState()
+                    showToast("Error de red: ${t.localizedMessage}")
                 }
             })
     }
 
+    private fun handleApiError(resp: Response<Reserva>) {
+        revertUIState()
+        val errorBody = resp.errorBody()?.string() ?: "Respuesta vacía"
+        Log.e("API_ERROR", """
+        Código: ${resp.code()}
+        Cuerpo: $errorBody
+        Headers: ${resp.headers()}
+    """.trimIndent())
+
+        val errorMessage = when (resp.code()) {
+            400 -> "Solicitud mal formada: ${parseErrorMessage(errorBody)}"
+            401 -> "No autorizado - Inicie sesión nuevamente"
+            404 -> "Recurso no encontrado"
+            500 -> "Error interno del servidor"
+            else -> "Error desconocido (${resp.code()})"
+        }
+
+        showToast(errorMessage)
+    }
+
+    private fun parseErrorMessage(errorBody: String): String {
+        return try {
+            JsonParser.parseString(errorBody).asJsonObject.let { json ->
+                when {
+                    json.has("Message") -> json["Message"].asString // Por si el servidor usa PascalCase
+                    json.has("errorDescription") -> json["errorDescription"].asString
+                    else -> errorBody.take(200) // Muestra fragmento si no es JSON
+                }
+            }
+        } catch (e: Exception) {
+            "Detalles técnicos: ${errorBody.take(200)}" // Limita a 200 caracteres
+        }
+    }
+
+    private fun revertUIState() {
+        availableSeats += qty
+        b.evPlacesDisponibles.text = availableSeats.toString()
+    }
+
     private fun nowIso(): String {
-        // Usa el formato exacto que espera la API (sin milisegundos ni zona horaria)
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
-        sdf.timeZone = TimeZone.getTimeZone("UTC") // Asegúrate de usar UTC
-        return sdf.format(Date())
+        return SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }.format(Date())
+    }
+
+    private fun formatDateForApi(dateString: String): String {
+        return try {
+            // El formato en que recibes la fecha (ajústalo si es necesario)
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
+
+            // Aquí defines el formato de salida ISO con milisegundos y Z
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply {
+                timeZone = TimeZone.getTimeZone("UTC")
+            }
+
+            // Parseas y luego formateas
+            val date = inputFormat.parse(dateString)
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            Log.e("DATE_ERROR", "Fecha recibida: $dateString", e)
+            // En caso de error, devuelves la fecha actual bien formateada
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US)
+                .apply { timeZone = TimeZone.getTimeZone("UTC") }
+                .format(Date())
+        }
+    }
+
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
 
     override fun onDestroyView() {

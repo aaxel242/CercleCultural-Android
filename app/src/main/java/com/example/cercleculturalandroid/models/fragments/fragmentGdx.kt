@@ -6,10 +6,9 @@ import android.view.View
 import android.view.ViewGroup
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration
 import com.badlogic.gdx.backends.android.AndroidFragmentApplication
-import com.butacas.core.MyGdxGame
 
 class fragmentGdx : AndroidFragmentApplication() {
-    private val game = MyGdxGame()
+  /*  private val game = MyGdxGame()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -23,6 +22,6 @@ class fragmentGdx : AndroidFragmentApplication() {
             numSamples = 2 // Anti-aliasing
         }
         return initializeForView(game, config)
-    }
+    }*/
 }
 
