@@ -7,8 +7,10 @@ import com.example.cercleculturalandroid.models.clases.Mensajes;
 import com.example.cercleculturalandroid.models.clases.Reserva;
 import com.example.cercleculturalandroid.models.clases.ReservaRequest;
 import com.example.cercleculturalandroid.models.clases.Usuari;
+import com.google.gson.JsonObject;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import retrofit2.Call;
@@ -50,6 +52,9 @@ public interface ApiService {
             @Path("userId") int userId,
             @Part MultipartBody.Part file
     );
-    @POST("api/Reservas")
-    Call<Reserva> postReserva(@Body ReservaRequest req);
+        @POST("api/Reservas")
+        Call<Reserva> postReserva(@Body ReservaRequest req);
+
+
+
 }

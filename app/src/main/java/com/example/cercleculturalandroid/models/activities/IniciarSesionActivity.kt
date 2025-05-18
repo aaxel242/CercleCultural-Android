@@ -49,7 +49,7 @@ class IniciarSesionActivity : AppCompatActivity() {
             } else {
                 val api = RetrofitClient.getClient().create(ApiService::class.java)
                 api.getUsuaris().enqueue(object : Callback<List<Usuari>> {
-                    override fun onResponse(
+                    override fun    onResponse(
                         call: Call<List<Usuari>>,
                         response: Response<List<Usuari>>
                                            ) {

@@ -222,10 +222,10 @@ class fragmentUsuario : Fragment() {
                             editCorreu.setText(user.email)
                             user.profileImage?.let { imageName ->
                                 Glide.with(requireContext())
-                                    .load("${RetrofitClient.BASE_URL}api/Usuaris/GetImage/$imageName")
-                                    .circleCrop()
-                                    .placeholder(R.drawable.img_cc_logo_blanco_y_negro)
-                                    .into(imgProfile)
+                                    //.load("${RetrofitClient.BASE_URL}api/Usuaris/GetImage/$imageName")
+                                   // .circleCrop()
+                                    //.placeholder(R.drawable.img_cc_logo_blanco_y_negro)
+                                    //.into(imgProfile)
                             }
                         }
                     }
