@@ -69,6 +69,7 @@
         android:background="@drawable/edit_text_personalizado"
         android:textColor="@color/black"
         android:paddingStart="15dp"
+        android:password="true"
         android:fontFamily="@font/worksansvariablefontwght"/>
 
     <LinearLayout

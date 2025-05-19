@@ -2,6 +2,7 @@ package com.example.cercleculturalandroid.models.fragments
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -14,6 +15,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageView
+import android.widget.ScrollView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -32,6 +35,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
+import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -193,42 +197,52 @@ class fragmentUsuario : Fragment() {
     }
 
     private fun uploadImageToServer(imageUri: Uri) {
+        // 1) Construimos MultipartBody.Part
         val path = currentPhotoPath ?: return
         val file = File(path)
-        val reqFile = file
-            .asRequestBody("image/jpeg".toMediaTypeOrNull())
-        val part = MultipartBody.Part
-            .createFormData("file", file.name, reqFile)
+        val reqFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val part = MultipartBody.Part.createFormData("file", file.name, reqFile)
 
-        RetrofitClient.getService()
-            .uploadProfileImage(userId, part)
+        // 2) Log del payload para depuración
+        Log.d("UPLOAD_PAYLOAD", "Uploading file: ${file.name}, path: $path")
+
+        RetrofitClient.getService().uploadProfileImage(userId, part)
             .enqueue(object : Callback<Usuari> {
-                override fun onResponse(
-                    call: Call<Usuari>,
-                    resp: Response<Usuari>
-                ) {
+                override fun onResponse(call: Call<Usuari>, resp: Response<Usuari>) {
                     if (resp.isSuccessful) {
-                        // El backend debe devolver el objeto Usuari
-                        // con profileImage = nombre del fichero
-                        val updated = resp.body()
-                        updated?.profileImage?.let { filename ->
-                            // Persistir localmente o simplemente recargar
-                            loadUserData()
-                        }
+                        // éxito…
+                        loadUserData()
                     } else {
-                        Toast.makeText(
-                            requireContext(),
-                            "Error servidor: ${resp.code()}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        // 1) Leo cuerpo completo
+                        val code = resp.code()
+                        val bodyStr = resp.errorBody()?.string() ?: "{}"
+                        Log.e("UPLOAD_ERROR", "HTTP $code\n$bodyStr")
+
+                        // 2) Intento parsear el JSON para extraer “Details”
+                        try {
+                            val obj = JSONObject(bodyStr)
+                            val err = obj.optString("Error", "Error $code")
+                            val details = obj.optJSONArray("Details")
+                            val detailMsg = StringBuilder(err).apply {
+                                if (details != null) {
+                                    for (i in 0 until details.length()) {
+                                        append("\n• ").append(details.getString(i))
+                                    }
+                                } else {
+                                    append("\n$bodyStr")
+                                }
+                            }.toString()
+
+                            showErrorDialog("Error al subir imagen (HTTP $code)", detailMsg)
+                        } catch (e: Exception) {
+                            // si no es JSON, muestro todo el texto
+                            showErrorDialog("Error al subir imagen (HTTP $code)", bodyStr)
+                        }
                     }
                 }
+
                 override fun onFailure(call: Call<Usuari>, t: Throwable) {
-                    Toast.makeText(
-                        requireContext(),
-                        "Fallo red: ${t.localizedMessage}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showErrorDialog("Fallo de red", t.localizedMessage ?: t.toString())
                 }
             })
     }
@@ -264,27 +278,61 @@ class fragmentUsuario : Fragment() {
     }
 
     private fun loadUserData() {
-        RetrofitClient.getService().getUsuari(userId)
+        RetrofitClient.getService()
+            .getUsuari(userId)
             .enqueue(object : Callback<Usuari> {
                 override fun onResponse(call: Call<Usuari>, resp: Response<Usuari>) {
+                    if (!resp.isSuccessful) {
+                        Toast.makeText(requireContext(),
+                                       "Error al cargar usuario: ${resp.code()}",
+                                       Toast.LENGTH_LONG).show()
+                        return
+                    }
                     resp.body()?.let { user ->
+                        // 1) Nombre y correo
                         editUsuari.setText(user.nom)
                         editCorreu.setText(user.email)
-                        user.profileImage?.let { imageName ->
-                            val url = "${RetrofitClient.BASE_URL}api/Usuaris/GetImage/$imageName"
+
+                        // 2) FotoPerfil: si existe, monta la URL y úsala con Glide
+                        user.fotoPerfil?.takeIf { it.isNotBlank() }?.let { filename ->
+                            val imageUrl = "${RetrofitClient.BASE_URL}imagenes/$filename"
                             Glide.with(requireContext())
-                                .load(url)
+                                .load(imageUrl)
                                 .circleCrop()
                                 .placeholder(R.drawable.img_cc_logo_blanco_y_negro)
                                 .into(imgProfile)
+                        } ?: run {
+                            // Si no hay foto, pon el placeholder
+                            imgProfile.setImageResource(R.drawable.img_cc_logo_blanco_y_negro)
                         }
                     }
                 }
-                override fun onFailure(call: Call<Usuari>, t: Throwable) { /*…*/ }
+                override fun onFailure(call: Call<Usuari>, t: Throwable) {
+                    Toast.makeText(requireContext(),
+                                   "Error de conexión: ${t.localizedMessage}",
+                                   Toast.LENGTH_LONG).show()
+                }
             })
     }
+
 
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
     }
+
+    private fun showErrorDialog(title: String, message: String) {
+        val tv = TextView(requireContext()).apply {
+            text = message
+            setPadding(24,24,24,24)
+        }
+        val scroll = ScrollView(requireContext()).apply {
+            addView(tv)
+        }
+        AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setView(scroll)
+            .setPositiveButton("OK", null)
+            .show()
+    }
+
 }

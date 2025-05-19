@@ -37,6 +37,7 @@ public interface ApiService {
     @GET("api/Usuaris/{id}")
     Call<Usuari> getUsuari(@Path("id") int id);
 
+
     @GET("api/Mensajes")
     Call<List<Mensajes>> getMensaje();
 
