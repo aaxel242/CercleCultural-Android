@@ -3,8 +3,10 @@ package com.example.cercleculturalandroid.models.fragments
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -13,6 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ScrollView
@@ -85,6 +88,28 @@ class fragmentUsuario : Fragment() {
         editCorreu = view.findViewById(R.id.EditTextCorreu)
         recyclerView = view.findViewById(R.id.recyclerReservas)
         imgProfile = view.findViewById(R.id.logo_admin)
+        view.findViewById<Button>(R.id.button_catalan).setOnClickListener { setLanguage("ca") }
+        view.findViewById<Button>(R.id.button_spanish).setOnClickListener { setLanguage("es") }
+        view.findViewById<Button>(R.id.button_english).setOnClickListener { setLanguage("en") }
+    }
+
+    private fun setLanguage(languageCode: String) {
+        // 1. Guardar idioma en SharedPreferences
+        val prefs = requireContext().getSharedPreferences("Settings", Context.MODE_PRIVATE)
+        prefs.edit().putString("MY_LANG", languageCode).apply()
+
+        // 2. Actualizar configuración
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+
+        // 3. Aplicar cambios (forma correcta para Android 10+)
+        requireContext().createConfigurationContext(config)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        // 4. Recargar actividad
+        activity?.recreate()
     }
 
     private fun setupProfileImage() {
