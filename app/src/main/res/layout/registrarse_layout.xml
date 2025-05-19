@@ -49,27 +49,6 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cognom"
-        android:fontFamily="@font/worksansvariablefontwght"
-        android:textSize="12dp"
-        android:layout_gravity="left"
-        android:textStyle="bold"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="94dp"/>
-
-    <EditText
-        android:id="@+id/editTextCognomIniciarSesion"
-        android:layout_width="234dp"
-        android:layout_height="39dp"
-        android:background="@drawable/edit_text_personalizado"
-        android:textColor="@color/black"
-        android:paddingStart="15dp"
-        android:fontFamily="@font/worksansvariablefontwght" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         android:text="Correu"
         android:fontFamily="@font/worksansvariablefontwght"
         android:textSize="12dp"

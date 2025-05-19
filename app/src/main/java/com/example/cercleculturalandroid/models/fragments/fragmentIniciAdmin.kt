@@ -85,6 +85,7 @@ class fragmentIniciAdmin : Fragment(R.layout.fragment_inici_admin) {
             .create(ApiService::class.java)
             .getEspais()
             .enqueue(object : Callback<List<Espai>> {
+                @RequiresApi(Build.VERSION_CODES.O)
                 override fun onResponse(
                     call: Call<List<Espai>>, response: Response<List<Espai>>
                                        ) {

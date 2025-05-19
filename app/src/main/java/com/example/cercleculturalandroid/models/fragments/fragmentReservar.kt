@@ -8,6 +8,7 @@ import android.widget.ScrollView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.cercleculturalandroid.api.ApiService
 import com.google.gson.Gson
 import com.example.cercleculturalandroid.api.RetrofitClient
 import com.example.cercleculturalandroid.databinding.FragmentReservarBinding
@@ -19,6 +20,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.cercleculturalandroid.models.TotalReservasResponse
+
 
 class fragmentReservar : Fragment(R.layout.fragment_reservar) {
     private var _b: FragmentReservarBinding? = null
@@ -45,27 +48,73 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
         _b = FragmentReservarBinding.bind(view)
         event = requireArguments().getParcelable(ARG_EVENT)!!
         userId = requireArguments().getInt(ARG_USER, -1)
-        availableSeats = event.aforament
-        setupUi()
+        fetchTotalReservas {
+            setupUi()
+        }
     }
+
+    private fun fetchTotalReservas(onDone: () -> Unit) {
+        RetrofitClient.getService()
+            .getTotalReservasEvento(event.id)
+            .enqueue(object : Callback<TotalReservasResponse> {
+                override fun onResponse(
+                    call: Call<TotalReservasResponse>,
+                    resp: Response<TotalReservasResponse>
+                                       ) {
+                    if (resp.isSuccessful) {
+                        val reserved = resp.body()?.total ?: 0
+                        availableSeats = event.aforament - reserved
+                    } else {
+                        availableSeats = 0
+                        toast("Error al cargar reservas del evento")
+                    }
+                    onDone()
+                }
+                override fun onFailure(call: Call<TotalReservasResponse>, t: Throwable) {
+                    availableSeats = 0
+                    toast("Fallo de red al cargar reservas")
+                    onDone()
+                }
+            })
+    }
+
 
     private fun setupUi() {
         with(b) {
-            imgVolver.setOnClickListener { parentFragmentManager.popBackStack() }
-            evName.text            = event.nom
-            evDesc.text            = event.descripcio
-            evUbicacion.text       = "Ubicación: ${event.ubicacio}"
-            evHorario.text         = "Horario: ${event.dataInici}"
-            evPlacesDisponibles.text = availableSeats.toString()
-            txtViewCantidad.text   = qty.toString()
-
+            btnReservar.isEnabled = availableSeats > 0
+            if (availableSeats == 0) {
+                evPlacesDisponibles.text = "Agotadas"
+                toast("No quedan plazas para este evento")
+            } else {
+                evPlacesDisponibles.text = availableSeats.toString()
+            }
+            txtViewCantidad.text = qty.toString()
             imgMenos.setOnClickListener {
-                if (qty > 1) qty--.also { txtViewCantidad.text = qty.toString() }
+                if (qty > 1) {
+                    qty--
+                    txtViewCantidad.text = qty.toString()
+                }
             }
             imgMas.setOnClickListener {
-                if (qty < availableSeats) qty++.also { txtViewCantidad.text = qty.toString() }
+                if (availableSeats == 0) {
+                    toast("No quedan más plazas")
+                    return@setOnClickListener
+                }
+                if (qty < 4 && qty < availableSeats) {
+                    qty++
+                    txtViewCantidad.text = qty.toString()
+                } else if (qty >= 4) {
+                    toast("Máximo 4 plazas por reserva")
+                } else {
+                    toast("No quedan más plazas disponibles")
+                }
             }
+            imgVolver.setOnClickListener { parentFragmentManager.popBackStack() }
             btnReservar.setOnClickListener { doReserve() }
+            evName.text      = event.nom
+            evDesc.text      = event.descripcio
+            evUbicacion.text = "Ubicación: ${event.ubicacio}"
+            evHorario.text   = "Horario: ${event.dataInici}"
         }
     }
 
@@ -77,16 +126,13 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
             toast("No quedan plazas"); return
         }
 
-        // Timestamp en UTC
         val now = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US).apply {
             timeZone = TimeZone.getTimeZone("UTC")
         }.format(Date())
 
-        // Actualiza UI inmediatamente
         availableSeats -= qty
         b.evPlacesDisponibles.text = availableSeats.toString()
 
-        // Construye el request
         val req = ReservaRequest(
             usuari_id       = userId,
             dataReserva     = now,
@@ -99,10 +145,8 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
             numPlaces       = qty
         )
 
-        // 1) Log completo del payload
         Log.d("PAYLOAD", Gson().toJson(req))
 
-        // 2) Envía y captura respuesta
         RetrofitClient.getService()
             .postReserva(req)
             .enqueue(object : Callback<Reserva> {
@@ -110,14 +154,11 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
                     if (resp.isSuccessful) {
                         toast("Reserva creada exitosamente")
                     } else {
-                        // revertir UI en caso de error
                         availableSeats += qty
                         b.evPlacesDisponibles.text = availableSeats.toString()
 
-                        // lee todo el cuerpo de error
                         val err = resp.errorBody()?.string() ?: "Sin cuerpo de error"
                         Log.e("API_ERROR_FULL", "Código ${resp.code()}: $err")
-                        // muestra el mensaje completo en Toast (si es corto) o dialogo si es largo
                         if (err.length < 200) {
                             toast("Error ${resp.code()}: $err")
                         } else {
@@ -134,11 +175,9 @@ class fragmentReservar : Fragment(R.layout.fragment_reservar) {
             })
     }
 
-    // Toast corto
     private fun toast(msg: String) =
         Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
 
-    // Para errores muy largos, mostramos diálogo desplazable
     private fun showErrorDialog(title: String, message: String) {
         val tv = TextView(requireContext()).apply {
             text = message

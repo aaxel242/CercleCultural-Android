@@ -6,7 +6,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    public static final String BASE_URL = "http://10.0.0.248/CCAPI/";
+    public static final String BASE_URL = "http://10.0.0.248/CCAPI/";  // ¡ojo con la barra al final!
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {
@@ -16,7 +16,6 @@ public class RetrofitClient {
                     .addConverterFactory(
                             GsonConverterFactory.create(
                                     new GsonBuilder()
-                                            // Mantén nombres tal cual
                                             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                                             .create()
                             )
