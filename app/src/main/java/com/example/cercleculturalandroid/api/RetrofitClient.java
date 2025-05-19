@@ -6,7 +6,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
-    public static final String BASE_URL = "http://192.168.68.121/CCAPI/";
+    public static final String BASE_URL = "http://10.0.0.248/CCAPI/";
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {
