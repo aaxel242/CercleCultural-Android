@@ -15,6 +15,7 @@ import com.example.cercleculturalandroid.models.clases.Usuari
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.security.MessageDigest
 
 class IniciarSesionActivity : AppCompatActivity() {
 
@@ -43,6 +44,7 @@ class IniciarSesionActivity : AppCompatActivity() {
         btnIniciarSesion.setOnClickListener {
             val email = etEmail.text.toString().trim()
             val pass  = etContrasenya.text.toString()
+            val encriptado = md5(pass)
 
             if (email.isEmpty() || pass.isEmpty()) {
                 Toast.makeText(this, "Si us plau, completa tots els camps", Toast.LENGTH_SHORT).show()
@@ -58,7 +60,7 @@ class IniciarSesionActivity : AppCompatActivity() {
                             // Buscamos usuario que coincida email y contraseña
                             val usuari = usuaris.find {
                                 it.email.equals(email, ignoreCase = true) &&
-                                        it.contrasenya == pass
+                                        it.contrasenya == encriptado
                             }
                             if (usuari != null) {
 
@@ -98,5 +100,10 @@ class IniciarSesionActivity : AppCompatActivity() {
                 })
             }
         }
+    }
+    fun md5(input: String): String {
+        val md = MessageDigest.getInstance("MD5")
+        val digest = md.digest(input.toByteArray())
+        return digest.joinToString("") { "%02x".format(it) }
     }
 }
