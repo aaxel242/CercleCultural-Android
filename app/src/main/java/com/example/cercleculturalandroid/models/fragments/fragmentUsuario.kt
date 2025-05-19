@@ -289,7 +289,7 @@ class fragmentUsuario : Fragment() {
                         return
                     }
                     resp.body()?.let { user ->
-                        // 1) Nombre y correo
+                        // 1) Nombre y correos
                         editUsuari.setText(user.nom)
                         editCorreu.setText(user.email)
 
