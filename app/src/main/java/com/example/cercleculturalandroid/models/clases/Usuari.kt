@@ -1,12 +1,14 @@
 package com.example.cercleculturalandroid.models.clases
 
-data class Usuari (
+import com.google.gson.annotations.SerializedName
+
+data class Usuari(
     val id: Int,
     val nom: String,
     val email: String,
     val contrasenya: String,
     val tipusUsuari: String,
     val idioma: String,
-    val profileImage: String?
-                  )
-
+    @SerializedName("FotoPerfil")
+    val fotoPerfil: String?
+                 )
