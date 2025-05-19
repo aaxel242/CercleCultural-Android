@@ -5,14 +5,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:gravity="center_horizontal"
         tools:context=".models.fragments.fragmentUsuario"
-        android:background="@color/fondo"
-        >
+        android:background="@color/fondo">
 
         <ImageView
             android:id="@+id/logo_admin"
@@ -20,7 +20,7 @@
             android:layout_height="120dp"
             android:src="@drawable/img_cc_logo_blanco_y_negro"
             android:layout_marginTop="70dp"
-            android:contentDescription="Foto de perfil"
+            android:contentDescription="@string/profile_photo_desc"
             android:clickable="true"
             android:focusable="true"
             android:scaleType="centerCrop"
@@ -29,73 +29,109 @@
         <Button
             android:layout_width="250dp"
             android:layout_height="60dp"
-            android:text="Configuració"
+            android:text="@string/settings_button"
             android:fontFamily="@font/worksansvariablefontwght"
             android:textColor="@android:color/black"
             android:backgroundTint="@color/azul"
             android:textStyle="bold"
             android:textSize="20sp"
-            android:layout_marginTop="50dp"
-            />
+            android:layout_marginTop="50dp"/>
 
         <TextView
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="Usuari"
+            android:text="@string/username_label"
             android:fontFamily="@font/worksansvariablefontwght"
             android:textColor="@android:color/black"
             android:textSize="20sp"
-            android:layout_marginTop="20dp"
-            />
+            android:layout_marginTop="20dp"/>
+
         <EditText
             android:id="@+id/EditTextUsuari"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/worksansvariablefontwght"
             android:textColor="@android:color/black"
-            android:text="Name Example"
+            android:text="@string/example_username"
             android:textSize="20sp"
             android:enabled="false"
             android:focusable="false"
-            android:inputType="none"
-            />
+            android:inputType="none"/>
+
         <TextView
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:text="Correu"
+            android:text="@string/email_label"
             android:fontFamily="@font/worksansvariablefontwght"
             android:textColor="@android:color/black"
-            android:textSize="20sp"
+            android:textSize="20sp"/>
 
-            />
         <EditText
             android:id="@+id/EditTextCorreu"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:fontFamily="@font/worksansvariablefontwght"
             android:textColor="@android:color/black"
-            android:text="example@example.com"
+            android:text="@string/example_email"
             android:textSize="20sp"
             android:enabled="false"
             android:focusable="false"
-            android:inputType="none"
-            />
+            android:inputType="none"/>
+
+        <LinearLayout
+            android:layout_width="350dp"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:gravity="center_horizontal"
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/button_catalan"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+                android:text="@string/button_catalan"
+                android:layout_marginRight="10dp"
+                android:fontFamily="@font/worksansvariablefontwght"
+                android:backgroundTint="@color/azul"
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/button_spanish"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+                android:text="@string/button_spanish"
+                android:fontFamily="@font/worksansvariablefontwght"
+                android:backgroundTint="@color/azul"
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
+
+            <Button
+                android:id="@+id/button_english"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+                android:text="@string/button_english"
+                android:layout_marginLeft="10dp"
+                android:fontFamily="@font/worksansvariablefontwght"
+                android:backgroundTint="@color/azul"
+                android:textColor="@color/black"
+                android:textSize="14sp"/>
+        </LinearLayout>
 
         <TextView
             android:layout_width="300dp"
             android:layout_height="wrap_content"
-            android:text="Entrades"
+            android:text="@string/entries_label"
             android:fontFamily="@font/worksansvariablefontwght"
             android:textColor="@android:color/black"
             android:textSize="20sp"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="20dp"
             android:textAlignment="center"
-            android:background="@color/azul"
-            />
+            android:background="@color/azul"/>
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerReservas"
             android:layout_width="300dp"
-            android:layout_height="500dp"
-            />
+            android:layout_height="500dp"/>
     </LinearLayout>
 </ScrollView>

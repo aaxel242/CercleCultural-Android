@@ -3,6 +3,7 @@ package com.example.cercleculturalandroid.api;
 
 import com.example.cercleculturalandroid.models.clases.Espai;
 import com.example.cercleculturalandroid.models.clases.Eventos;
+import com.example.cercleculturalandroid.models.clases.IdiomaDTO;
 import com.example.cercleculturalandroid.models.clases.Mensajes;
 import com.example.cercleculturalandroid.models.clases.Reserva;
 import com.example.cercleculturalandroid.models.clases.ReservaRequest;
@@ -18,6 +19,7 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Part;
 import retrofit2.http.Path;
 
@@ -36,6 +38,11 @@ public interface ApiService {
 
     @GET("api/Usuaris/{id}")
     Call<Usuari> getUsuari(@Path("id") int id);
+    @PUT("api/Usuaris/ActualizarIdioma/{id}")
+    Call<Usuari> actualizarIdioma(
+            @Path("id") int id,
+            @Body IdiomaDTO idiomaDTO // ← Usa el DTO aquí
+    );
 
 
     @GET("api/Mensajes")

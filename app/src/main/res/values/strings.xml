@@ -1,6 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Cercle Cultural Android</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="escribe_un_mensaje">Escribe un mensaje...</string>
+    <string name="app_name">Cercle Cultural</string>
+    <string name="settings_button">Configuración</string>
+    <string name="username_label">Usuario</string>
+    <string name="email_label">Correo</string>
+    <string name="entries_label">Entradas</string>
+    <string name="profile_photo_desc">Foto de perfil</string>
+
+    <string name="example_username">Nombre de ejemplo</string>
+    <string name="example_email">ejemplo@ejemplo.com</string>
+    <string name="idioma_actualizado">Idioma actualizado</string>
+    <string name="reinicio_aplicacion">¿Quieres reiniciar la aplicación para aplicar todos los cambios?</string>
+    <string name="reiniciar_ahora">Reiniciar ahora</string>
+    <string name="reiniciar_mas_tarde">Más tarde</string>
+
+    <string name="button_catalan">Catalán</string>
+    <string name="button_spanish">Español</string>
+    <string name="button_english">Inglés</string>
 </resources>

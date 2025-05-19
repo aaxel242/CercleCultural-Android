@@ -3,8 +3,10 @@ package com.example.cercleculturalandroid.models.fragments
 import android.Manifest
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -13,6 +15,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.ScrollView
@@ -28,6 +31,7 @@ import com.example.cercleculturalandroid.R
 import com.example.cercleculturalandroid.api.ApiService
 import com.example.cercleculturalandroid.api.RetrofitClient
 import com.example.cercleculturalandroid.models.adapters.ReservasAdapter
+import com.example.cercleculturalandroid.models.clases.IdiomaDTO
 import com.example.cercleculturalandroid.models.clases.Reserva
 import com.example.cercleculturalandroid.models.clases.Usuari
 import okhttp3.MediaType
@@ -51,6 +55,7 @@ class fragmentUsuario : Fragment() {
     private val userId by lazy { arguments?.getInt("userId") ?: -1 }
     private lateinit var reservasAdapter: ReservasAdapter
     private var currentPhotoPath: String? = null
+
 
     companion object {
         private const val REQUEST_IMAGE_CAPTURE    = 1001
@@ -85,6 +90,9 @@ class fragmentUsuario : Fragment() {
         editCorreu = view.findViewById(R.id.EditTextCorreu)
         recyclerView = view.findViewById(R.id.recyclerReservas)
         imgProfile = view.findViewById(R.id.logo_admin)
+        view.findViewById<Button>(R.id.button_catalan).setOnClickListener { setLanguage("ca") }
+        view.findViewById<Button>(R.id.button_spanish).setOnClickListener { setLanguage("es") }
+        view.findViewById<Button>(R.id.button_english).setOnClickListener { setLanguage("en") }
     }
 
     private fun setupProfileImage() {
@@ -289,11 +297,12 @@ class fragmentUsuario : Fragment() {
                         return
                     }
                     resp.body()?.let { user ->
-                        // 1) Nombre y correo
+                        // 1) Nombre y correo (existente)
                         editUsuari.setText(user.nom)
                         editCorreu.setText(user.email)
 
-                        // 2) FotoPerfil: si existe, monta la URL y úsala con Glide
+
+                        // 3) FotoPerfil (existente)
                         user.fotoPerfil?.takeIf { it.isNotBlank() }?.let { filename ->
                             val imageUrl = "${RetrofitClient.BASE_URL}imagenes/$filename"
                             Glide.with(requireContext())
@@ -302,11 +311,11 @@ class fragmentUsuario : Fragment() {
                                 .placeholder(R.drawable.img_cc_logo_blanco_y_negro)
                                 .into(imgProfile)
                         } ?: run {
-                            // Si no hay foto, pon el placeholder
                             imgProfile.setImageResource(R.drawable.img_cc_logo_blanco_y_negro)
                         }
                     }
                 }
+
                 override fun onFailure(call: Call<Usuari>, t: Throwable) {
                     Toast.makeText(requireContext(),
                                    "Error de conexión: ${t.localizedMessage}",
@@ -334,5 +343,29 @@ class fragmentUsuario : Fragment() {
             .setPositiveButton("OK", null)
             .show()
     }
+
+    private fun setLanguage(languageCode: String) {
+        // 1. Guardar idioma en SharedPreferences
+        val prefs = requireContext().getSharedPreferences("Settings", Context.MODE_PRIVATE)
+        prefs.edit().putString("MY_LANG", languageCode).apply()
+
+        // 2. Actualizar configuración
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = Configuration(resources.configuration)
+        config.setLocale(locale)
+
+        // 3. Aplicar cambios (forma correcta para Android 10+)
+        requireContext().createConfigurationContext(config)
+        resources.updateConfiguration(config, resources.displayMetrics)
+
+        // 4. Recargar actividad
+        activity?.recreate()
+    }
+
+// En onViewCreated:
+
+
+
 
 }

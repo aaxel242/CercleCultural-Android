@@ -64,7 +64,7 @@
             android:layout_height="48dp"
             android:layout_weight="1"
             android:minHeight="48dp"
-            android:hint="@string/escribe_un_mensaje"
+            android:hint="Escriu un missatge"
             android:inputType="textMultiLine"
             android:padding="12dp"
             android:textSize="16sp"/>

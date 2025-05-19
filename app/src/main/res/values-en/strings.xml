@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cercle Cultural</string>
+    <string name="settings_button">Settings</string>
+    <string name="username_label">User</string>
+    <string name="email_label">Email</string>
+    <string name="entries_label">Entries</string>
+    <string name="profile_photo_desc">Profile photo</string>
+
+    <string name="example_username">Example name</string>
+    <string name="example_email">example@example.com</string>
+    <string name="idioma_actualizado">Idioma actualizado</string>
+    <string name="reinicio_aplicacion">¿Quieres reiniciar la aplicación para aplicar todos los cambios?</string>
+    <string name="reiniciar_ahora">Reiniciar ahora</string>
+    <string name="reiniciar_mas_tarde">Más tarde</string>
+
+    <string name="button_catalan">Catalan</string>
+    <string name="button_spanish">Spanish</string>
+    <string name="button_english">English</string>
+</resources>
