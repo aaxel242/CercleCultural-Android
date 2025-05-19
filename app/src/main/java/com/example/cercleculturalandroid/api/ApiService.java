@@ -1,6 +1,6 @@
-// app/src/main/java/com/example/cercleculturalandroid/api/ApiService.java
 package com.example.cercleculturalandroid.api;
 
+import com.example.cercleculturalandroid.models.TotalReservasResponse;
 import com.example.cercleculturalandroid.models.clases.Espai;
 import com.example.cercleculturalandroid.models.clases.Eventos;
 import com.example.cercleculturalandroid.models.clases.IdiomaDTO;
@@ -8,6 +8,7 @@ import com.example.cercleculturalandroid.models.clases.Mensajes;
 import com.example.cercleculturalandroid.models.clases.Reserva;
 import com.example.cercleculturalandroid.models.clases.ReservaRequest;
 import com.example.cercleculturalandroid.models.clases.Usuari;
+import com.example.cercleculturalandroid.models.clases.UsuariRequest;
 import com.google.gson.JsonObject;
 
 import java.util.List;
@@ -60,9 +61,14 @@ public interface ApiService {
             @Path("userId") int userId,
             @Part MultipartBody.Part file
     );
-        @POST("api/Reservas")
-        Call<Reserva> postReserva(@Body ReservaRequest req);
+    @POST("api/Reservas")
+    Call<Reserva> postReserva(@Body ReservaRequest req);
 
+    @GET("api/Reservas/TotalReservasEvento/{eventId}")
+    Call<TotalReservasResponse> getTotalReservasEvento(@Path("eventId") int eventId);
+
+    @POST("api/Usuaris")
+    Call<Usuari> postUsuari(@Body UsuariRequest req);
 
 
 }
