@@ -48,6 +48,18 @@ class fragmentUsuario : Fragment() {
     private lateinit var reservasAdapter: ReservasAdapter
     private var currentPhotoPath: String? = null
 
+    companion object {
+        private const val REQUEST_IMAGE_CAPTURE    = 1001
+        private const val REQUEST_IMAGE_PERMISSION = 1002
+
+
+        fun newInstance(userId: Int) = fragmentUsuario().apply {
+            arguments = Bundle().apply {
+                putInt("userId", userId)
+            }
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -78,77 +90,102 @@ class fragmentUsuario : Fragment() {
     }
 
     private fun checkPermissionsAndOpenPicker() {
-        val permissions = arrayOf(
-            Manifest.permission.CAMERA,
-            Manifest.permission.READ_EXTERNAL_STORAGE
-                                 )
-
+        // Cámara
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(
+                arrayOf(Manifest.permission.CAMERA),
+                REQUEST_IMAGE_PERMISSION
+            )
+            return
+        }
+        // Lectura externa
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
-                Manifest.permission.CAMERA
-                                             ) != PackageManager.PERMISSION_GRANTED
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(permissions, REQUEST_IMAGE_PERMISSION)
-        } else {
-            openImagePicker()
+            requestPermissions(
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                REQUEST_IMAGE_PERMISSION
+            )
+            return
         }
+        // Ya tenemos ambos permisos
+        openImagePicker()
     }
 
+
     private fun openImagePicker() {
-        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        // Galería
+        val galleryIntent = Intent(
+            Intent.ACTION_PICK,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        )
+        // Fichero temporal
         val photoFile = createImageFile()
-        val photoUri = FileProvider.getUriForFile(
+        val uri = FileProvider.getUriForFile(
             requireContext(),
             "${requireContext().packageName}.fileprovider",
             photoFile
-                                                 )
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE).apply {
-            putExtra(MediaStore.EXTRA_OUTPUT, photoUri)
-        }
+        )
+        // Cámara
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            .apply { putExtra(MediaStore.EXTRA_OUTPUT, uri) }
 
-        val chooserIntent = Intent.createChooser(galleryIntent, "Seleccionar imagen")
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
-        startActivityForResult(chooserIntent, REQUEST_IMAGE_CAPTURE)
+        // Chooser
+        val chooser = Intent.createChooser(galleryIntent, "Selecciona imagen")
+        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, arrayOf(cameraIntent))
+        startActivityForResult(chooser, REQUEST_IMAGE_CAPTURE)
     }
 
     private fun createImageFile(): File {
-        val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
-        val storageDir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
-        return File.createTempFile(
-            "JPEG_${timeStamp}_",
-            ".jpg",
-            storageDir
-                                  ).apply {
-            currentPhotoPath = absolutePath
+        val ts = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+            .format(Date())
+        val dir = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+        return File.createTempFile("JPEG_${ts}_", ".jpg", dir).also {
+            currentPhotoPath = it.absolutePath
         }
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-                                           ) {
-        if (requestCode == REQUEST_IMAGE_PERMISSION && grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
-            openImagePicker()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_IMAGE_CAPTURE -> {
-                    val imageUri = Uri.fromFile(File(currentPhotoPath ?: return))
-                    handleImageSelection(imageUri)
-                }
-                else -> {
-                    data?.data?.let { uri ->
-                        handleImageSelection(uri)
-                    }
-                }
+        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_IMAGE_PERMISSION) {
+            if (grantResults.isNotEmpty()
+                && grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+            ) {
+                openImagePicker()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "Necesitamos permisos para tomar/seleccionar la foto",
+                    Toast.LENGTH_LONG
+                ).show()
+                openImagePicker()
             }
         }
     }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode != Activity.RESULT_OK) return
+
+        val imageUri: Uri? = when (requestCode) {
+            REQUEST_IMAGE_CAPTURE -> {
+                currentPhotoPath?.let { path -> Uri.fromFile(File(path)) }
+            }
+            else -> data?.data
+        }
+        imageUri?.let {
+            imgProfile.setImageURI(it)
+            uploadImageToServer(it)
+        }
+    }
+
 
     private fun handleImageSelection(imageUri: Uri) {
         imgProfile.setImageURI(imageUri)
@@ -156,24 +193,42 @@ class fragmentUsuario : Fragment() {
     }
 
     private fun uploadImageToServer(imageUri: Uri) {
-        val file = File(currentPhotoPath ?: return)
-        val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
-        val body = MultipartBody.Part.createFormData("file", file.name, requestFile)
+        val path = currentPhotoPath ?: return
+        val file = File(path)
+        val reqFile = file
+            .asRequestBody("image/jpeg".toMediaTypeOrNull())
+        val part = MultipartBody.Part
+            .createFormData("file", file.name, reqFile)
 
-        RetrofitClient.getClient()
-            .create(ApiService::class.java)
-            .uploadProfileImage(userId, body)
+        RetrofitClient.getService()
+            .uploadProfileImage(userId, part)
             .enqueue(object : Callback<Usuari> {
-                override fun onResponse(call: Call<Usuari>, response: Response<Usuari>) {
-                    if (response.isSuccessful) {
-                        Log.d("Upload", "Imagen subida: ${response.body()?.profileImage}")
-                        loadUserData()
+                override fun onResponse(
+                    call: Call<Usuari>,
+                    resp: Response<Usuari>
+                ) {
+                    if (resp.isSuccessful) {
+                        // El backend debe devolver el objeto Usuari
+                        // con profileImage = nombre del fichero
+                        val updated = resp.body()
+                        updated?.profileImage?.let { filename ->
+                            // Persistir localmente o simplemente recargar
+                            loadUserData()
+                        }
                     } else {
-                        Log.e("Upload", "Error del servidor: ${response.code()}")
+                        Toast.makeText(
+                            requireContext(),
+                            "Error servidor: ${resp.code()}",
+                            Toast.LENGTH_SHORT
+                        ).show()
                     }
                 }
                 override fun onFailure(call: Call<Usuari>, t: Throwable) {
-                    Log.e("Upload", "Error de red: ${t.message}")
+                    Toast.makeText(
+                        requireContext(),
+                        "Fallo red: ${t.localizedMessage}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             })
     }
@@ -209,46 +264,27 @@ class fragmentUsuario : Fragment() {
     }
 
     private fun loadUserData() {
-        if (userId == -1) return
-
-        RetrofitClient.getClient()
-            .create(ApiService::class.java)
-            .getUsuari(userId)
+        RetrofitClient.getService().getUsuari(userId)
             .enqueue(object : Callback<Usuari> {
-                override fun onResponse(call: Call<Usuari>, response: Response<Usuari>) {
-                    if (response.isSuccessful) {
-                        response.body()?.let { user ->
-                            editUsuari.setText(user.nom)
-                            editCorreu.setText(user.email)
-                            user.profileImage?.let { imageName ->
-                                Glide.with(requireContext())
-                                    //.load("${RetrofitClient.BASE_URL}api/Usuaris/GetImage/$imageName")
-                                   // .circleCrop()
-                                    //.placeholder(R.drawable.img_cc_logo_blanco_y_negro)
-                                    //.into(imgProfile)
-                            }
+                override fun onResponse(call: Call<Usuari>, resp: Response<Usuari>) {
+                    resp.body()?.let { user ->
+                        editUsuari.setText(user.nom)
+                        editCorreu.setText(user.email)
+                        user.profileImage?.let { imageName ->
+                            val url = "${RetrofitClient.BASE_URL}api/Usuaris/GetImage/$imageName"
+                            Glide.with(requireContext())
+                                .load(url)
+                                .circleCrop()
+                                .placeholder(R.drawable.img_cc_logo_blanco_y_negro)
+                                .into(imgProfile)
                         }
                     }
                 }
-
-                override fun onFailure(call: Call<Usuari>, t: Throwable) {
-                    showError("Error de conexión: ${t.message}")
-                }
+                override fun onFailure(call: Call<Usuari>, t: Throwable) { /*…*/ }
             })
     }
 
     private fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
-    }
-
-    companion object {
-        private const val REQUEST_IMAGE_CAPTURE = 1001
-        private const val REQUEST_IMAGE_PERMISSION = 1002
-
-        fun newInstance(userId: Int) = fragmentUsuario().apply {
-            arguments = Bundle().apply {
-                putInt("userId", userId)
-            }
-        }
     }
 }
